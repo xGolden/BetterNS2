@@ -499,8 +499,7 @@ end
 
 
 function CreateBetterNS2OptionsMenu()
-    local categories = {
-    }
+    local categories = BetterNS2OptionsCategories
 
     local options = {
     }

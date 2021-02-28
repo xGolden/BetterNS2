@@ -1,0 +1,4 @@
+modEntry = {
+    FileHooks = "lua/BetterNS2_FileHooks.lua",
+    Priority = 50
+}

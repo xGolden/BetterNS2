@@ -14,11 +14,17 @@ BNS2_Expandable_Dropdown = GetMultiWrappedClass(GUIMenuDropdownWidget, {"Option"
 BNS2_Expandable_Slider = GetMultiWrappedClass(GUIMenuSliderEntryWidget, {"Option", "Tooltip", "Expandable"})
 
 function BetterNS2GetOption(key)
-    return GetOptionsMenu():GetOptionWidget(key):GetValue()
-end
-
-function BetterNS2GetOptionValue(key)
-
+    local value = GetOptionsMenu():GetOptionWidget(key):GetValue()
+    if type(value) == "cdata" and value:isa("Color") then
+        value = ColorToColorInt(value)
+    elseif type(value) == "boolean" then
+        if value then
+            value = 1
+        else
+            value = 0
+        end
+    end
+    return value
 end
 
 local function BetterNS2RestartScripts(scripts)
@@ -109,12 +115,11 @@ local function createPostInitFunctionFromParent(parent)
             self:SetExpanded(crazyAVSelected and customAVStyleSelected)
         end
     elseif parent == "BETTERNS2_AVGorgeUnique" then
-        return function (self)
+        return function(self)
             self:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
                     function(self, value)
                         local crazyAVSelected = value == "shaders/Cr4zyAV.screenfx"
-                        local avGorgeUniqueValue = GetOptionsMenu():GetOptionWidget("BETTERNS2_AVGorgeUnique"):GetValue()
-                        local avGorgeUniqueSelected = avGorgeUniqueValue ~= 0
+                        local avGorgeUniqueSelected = GetOptionsMenu():GetOptionWidget("BETTERNS2_AVGorgeUnique"):GetValue()
                         self:SetExpanded(crazyAVSelected and avGorgeUniqueSelected)
                     end)
             self:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AVGorgeUnique"), "OnValueChanged",
@@ -127,12 +132,11 @@ local function createPostInitFunctionFromParent(parent)
 
             local betterns2AVValue = GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"):GetValue()
             local crazyAVSelected = betterns2AVValue == "shaders/Cr4zyAV.screenfx"
-            local avGorgeUniqueValue = GetOptionsMenu():GetOptionWidget("BETTERNS2_AVGorgeUnique"):GetValue()
-            local avGorgeUniqueSelected = avGorgeUniqueValue
+            local avGorgeUniqueSelected = GetOptionsMenu():GetOptionWidget("BETTERNS2_AVGorgeUnique"):GetValue()
             self:SetExpanded(crazyAVSelected and avGorgeUniqueSelected)
         end
     elseif parent == "BETTERNS2_AVDesaturation" then
-        return function (self)
+        return function(self)
             self:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
                     function(self, value)
                         local crazyAVSelected = value == "shaders/Cr4zyAV.screenfx"
@@ -155,7 +159,7 @@ local function createPostInitFunctionFromParent(parent)
             self:SetExpanded(crazyAVSelected and avDesaturationSelected)
         end
     elseif parent == "BETTERNS2_AVViewModelStyle" then
-        return function (self)
+        return function(self)
             self:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
                     function(self, value)
                         local crazyAVSelected = value == "shaders/Cr4zyAV.screenfx"
@@ -473,9 +477,8 @@ optionname = {
     type = "",
     optionType = "",
     values = {},
-    defaultValue = x,
+    default = x,
     category = "",
-    valueType = "",
     sort = "",
 
     -- optional parameters
@@ -484,8 +487,6 @@ optionname = {
     minValue = x,
     maxValue = y,
     decimalPlaces = z,
-    applyOnLoadComplete = bool,
-    resetSettingInBuild = t
 }
 ]]
 BetterNS2Options = {
@@ -521,7 +522,7 @@ BetterNS2Options = {
         category = "alienvision",
         immediateUpdate = function() UpdateAlienVision() end,
         tooltipIcon = "ui/tooltipIcons/av_style.dds",
-        helpImageSize = Vector(512, 256, 0),
+        tooltipIconSize = Vector(512, 256, 0),
         children = { "av_closecolor", "av_closeintensity", "av_distantcolor", "av_distantintensity" },
         hideValues = { 0 },
         sort = "C03",
@@ -791,7 +792,6 @@ BetterNS2Options = {
         sort = "C23",
         tooltipIcon = "ui/tooltipIcons/av_nofill.dds",
         tooltipIconSize = Vector(512, 256, 0),
-        resetSettingInBuild = 237,
         parent = "BETTERNS2_AV"
     },
     {
@@ -849,7 +849,6 @@ BetterNS2Options = {
         children = { "av_desaturationintensity", "av_desaturationblend" },
         hideValues = { 0 },
         sort = "C27",
-        resetSettingInBuild = 237,
         parent = "BETTERNS2_AV"
     },
     {
@@ -940,8 +939,8 @@ BetterNS2Options = {
         label = "Nanoshield AV highlight",
         tooltip = "Improves nanoshield visibility by showing an inverted colour Nano effect on marine players and structures. May have side effects in some blue and brightly lit areas",
         type = "expandable_checkbox",
-        optionType = "int",
-        default = 0,
+        optionType = "bool",
+        default = false,
         category = "alienvision",
         immediateUpdate = function() UpdateAlienVision() end,
         tooltipIcon = "ui/tooltipIcons/av_nano.dds",

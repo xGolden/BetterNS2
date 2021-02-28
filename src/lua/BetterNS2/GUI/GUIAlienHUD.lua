@@ -1,5 +1,3 @@
-Script.Load("lua/BetterNS2/BetterNS2_Utility.lua")
-
 local originalAlienInit = GUIAlienHUD.Initialize
 function GUIAlienHUD:Initialize()
     originalAlienInit(self)
@@ -23,7 +21,7 @@ function UpdateAlienVision()
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVEdgeClean"), 20) +
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVNanoshield"), 18) +
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVStyle"), 16) +
-            bit.lshift(BetterNS2BoolToInt(BetterNS2GetOption("BETTERNS2_AVGorgeUnique")), 14) +
+            bit.lshift(BetterNS2GetOption("BETTERNS2_AVGorgeUnique"), 14) +
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVOffStyle"), 12) +
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVEdges"), 10) +
             bit.lshift(BetterNS2GetOption("BETTERNS2_AVStructureColor"), 8) +
@@ -71,4 +69,4 @@ function UpdateAlienVision()
 
     --viewmodel
     useShader:SetParameter("avViewModel", BetterNS2GetOption("BETTERNS2_AVViewModelIntensity"))
-end
+    end

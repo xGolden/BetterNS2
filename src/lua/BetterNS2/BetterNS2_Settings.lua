@@ -27,20 +27,20 @@ local function isInteger(x)
     return math.floor(x) == x
 end
 
-function BetterNS2GetOption(key)
-    if BetterNS2Options[key] ~= nil then
-        if BetterNS2Options[key].disabled then
-            local ret = ConditionalValue(BetterNS2Options[key].disabledValue == nil, BetterNS2Options[key].defaultValue, BetterNS2Options[key].disabledValue)
-            return ret
-        elseif BetterNS2Options["castermode"] and BetterNS2Options["castermode"].currentValue and not BetterNS2Options[key].ignoreCasterMode then
-            return BetterNS2Options[key].defaultValue
-        else
-            return BetterNS2Options[key].currentValue
-        end
-    end
-
-    return nil
-end
+--function BetterNS2GetOption(key)
+--    if BetterNS2Options[key] ~= nil then
+--        if BetterNS2Options[key].disabled then
+--            local ret = ConditionalValue(BetterNS2Options[key].disabledValue == nil, BetterNS2Options[key].defaultValue, BetterNS2Options[key].disabledValue)
+--            return ret
+--        elseif BetterNS2Options["castermode"] and BetterNS2Options["castermode"].currentValue and not BetterNS2Options[key].ignoreCasterMode then
+--            return BetterNS2Options[key].defaultValue
+--        else
+--            return BetterNS2Options[key].currentValue
+--        end
+--    end
+--
+--    return nil
+--end
 
 function BetterNS2GetOptionParam(key, param)
     if BetterNS2Options[key][param] ~= nil then

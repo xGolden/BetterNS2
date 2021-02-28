@@ -1,6 +1,6 @@
 kBetterNS2Version = 1
 
-Script.Load("lua/Shared/BetterNS2_Utility.lua")
+Script.Load("lua/BetterNS2/Shared/BetterNS2_Utility.lua")
 
 if not BetterNS2MainMenu then
     local kBetterNS2OptionMessage =

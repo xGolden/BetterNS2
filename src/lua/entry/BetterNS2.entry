@@ -1,6 +1,4 @@
 modEntry = {
-    Client = "lua/BetterNS2_Client.lua",
-    Shared = "lua/BetterNS2_Shared.lua",
     FileHooks = "lua/BetterNS2_FileHooks.lua",
     Priority = 50
 }

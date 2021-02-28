@@ -27,6 +27,24 @@ function BetterNS2GetOption(key)
     return value
 end
 
+local function updateAlienVisionInGame()
+    if kInGame then
+        UpdateAlienVision()
+    end
+end
+
+local function BetterNS2RestartInGameScripts(scripts)
+    if kInGame then
+        for _, currentScript in ipairs(scripts) do
+            local script = ClientUI.GetScript(currentScript)
+            if script then
+                script:Uninitialize()
+                script:Initialize()
+            end
+        end
+    end
+end
+
 local function BetterNS2RestartScripts(scripts)
     for _, currentScript in ipairs(scripts) do
         local script = ClientUI.GetScript(currentScript)
@@ -506,7 +524,7 @@ BetterNS2Options = {
         },
         default = "shaders/DarkVision.screenfx",
         category = "alienvision",
-        immediateUpdate = function() BetterNS2RestartScripts({ "GUIAlienHUD" }) end,
+        immediateUpdate = function() BetterNS2RestartInGameScripts({ "GUIAlienHUD" }) end,
         children = { "av_colormarine", "av_marineintensity", "av_coloralien", "av_alienintensity", "av_style", "av_offstyle", "av_closecolor", "av_closeintensity", "av_distantcolor", "av_distantintensity", "av_playercolor", "av_gorgeunique", "av_structurecolor", "av_blenddistance", "av_worldintensity", "av_edges", "av_edgesize", "av_desaturation", "av_viewmodelstyle", "av_activationeffect", "av_skybox", "av_colormarinestruct", "av_mstructintensity", "av_coloralienstruct", "av_astructintensity" },
         hideValues = { 0, 1, 2, 3, 4 },
         sort = "C02",
@@ -520,7 +538,7 @@ BetterNS2Options = {
         choices  = { "Minimal", "Original", "Depth Fog", "Edge and World" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         tooltipIcon = "ui/tooltipIcons/av_style.dds",
         tooltipIconSize = Vector(512, 256, 0),
         children = { "av_closecolor", "av_closeintensity", "av_distantcolor", "av_distantintensity" },
@@ -537,7 +555,7 @@ BetterNS2Options = {
         choices  = { "Nothing", "Minimal world edges", "Coloured edges", "Marine only edges" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         tooltipIcon = "ui/tooltipIcons/av_offstyle.dds",
         tooltipIconSize = Vector(512, 256, 0),
         sort = "C04",
@@ -551,7 +569,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0x0030FE,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C05",
         parent = "BETTERNS2_AVStyle",
     },
@@ -565,7 +583,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C068",
         parent = "BETTERNS2_AVStyle"
     },
@@ -577,7 +595,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0x49006E,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C07",
         parent = "BETTERNS2_AVStyle"
     },
@@ -591,7 +609,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C08",
         parent = "BETTERNS2_AVStyle"
     },
@@ -604,7 +622,7 @@ BetterNS2Options = {
         choices  = { "All Players", "Marines Only", "Alien Only", "No Players" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C09",
         parent = "BETTERNS2_AV"
     },
@@ -616,7 +634,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0xFF8900,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C10",
         parent = "BETTERNS2_AV"
     },
@@ -630,7 +648,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C11",
         parent = "BETTERNS2_AV"
     },
@@ -642,7 +660,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0x008CFE,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C12",
         parent = "BETTERNS2_AV"
     },
@@ -656,7 +674,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C13",
         parent = "BETTERNS2_AV"
     },
@@ -670,7 +688,7 @@ BetterNS2Options = {
         category = "alienvision",
         hideValues = { 0 },
         children = { "av_colorgorge", "av_gorgeintensity" },
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C14",
         parent = "BETTERNS2_AV",
     },
@@ -682,7 +700,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0x00FF00,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C15",
         parent = "BETTERNS2_AVGorgeUnique"
     },
@@ -696,7 +714,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C16",
         parent = "BETTERNS2_AVGorgeUnique"
     },
@@ -709,7 +727,7 @@ BetterNS2Options = {
         choices  = { "All Structures", "Marines Structures Only", "Alien Structures Only", "No Structures" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C17",
         parent = "BETTERNS2_AV"
     },
@@ -721,7 +739,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0xFF0700,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C18",
         parent = "BETTERNS2_AV"
     },
@@ -735,7 +753,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C19",
         parent = "BETTERNS2_AV"
     },
@@ -747,7 +765,7 @@ BetterNS2Options = {
         optionType = "color",
         default = 0x00FE80,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C20",
         parent = "BETTERNS2_AV"
     },
@@ -761,7 +779,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C21",
         parent = "BETTERNS2_AV"
     },
@@ -775,7 +793,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 10.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C22",
         parent = "BETTERNS2_AV"
     },
@@ -788,7 +806,7 @@ BetterNS2Options = {
         choices  = { "Normal", "Thicker Peripheral Edges", "Normal, No Fill", "Thicker Peripheral, No Fill" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C23",
         tooltipIcon = "ui/tooltipIcons/av_nofill.dds",
         tooltipIconSize = Vector(512, 256, 0),
@@ -804,7 +822,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 4.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C24",
         parent = "BETTERNS2_AV"
     },
@@ -817,7 +835,7 @@ BetterNS2Options = {
         choices  = { "Old", "New" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         hideValues = { 0 },
         sort = "C25",
         parent = "BETTERNS2_AV"
@@ -832,7 +850,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 2.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C26",
         parent = "BETTERNS2_AV"
     },
@@ -845,7 +863,7 @@ BetterNS2Options = {
         choices  = { "None", "Full Scene", "Desaturate Distance", "Desaturate Close" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         children = { "av_desaturationintensity", "av_desaturationblend" },
         hideValues = { 0 },
         sort = "C27",
@@ -861,7 +879,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 1.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C28",
         parent = "BETTERNS2_AVDesaturation"
     },
@@ -875,7 +893,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 10.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C29",
         parent = "BETTERNS2_AVDesaturation"
     },
@@ -888,7 +906,7 @@ BetterNS2Options = {
         choices  = { "Alien Vision", "Default" },
         default = 1,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         children = { "av_viewmodelintensity" },
         hideValues = { 1 },
         sort = "C30",
@@ -904,7 +922,7 @@ BetterNS2Options = {
         minValue = 0.0,
         maxValue = 1.0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C31",
         parent = "BETTERNS2_AVViewModelStyle"
     },
@@ -917,7 +935,7 @@ BetterNS2Options = {
         choices  = { "Normal Sky", "Black", "Alien Vision" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C32",
         parent = "BETTERNS2_AV"
     },
@@ -930,7 +948,7 @@ BetterNS2Options = {
         choices  = { "Distance Pulse", "Fade In", "Instant On" },
         default = 0,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         sort = "C33",
         parent = "BETTERNS2_AV"
     },
@@ -942,7 +960,7 @@ BetterNS2Options = {
         optionType = "bool",
         default = false,
         category = "alienvision",
-        immediateUpdate = function() UpdateAlienVision() end,
+        immediateUpdate = function() updateAlienVisionInGame() end,
         tooltipIcon = "ui/tooltipIcons/av_nano.dds",
         tooltipIconSize = Vector(384, 192, 0),
         sort = "C34",

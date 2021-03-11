@@ -1,3 +1,5 @@
+Script.Load('lua/BetterNS2/widgets/GUIMenuSavePromptDialog.lua')
+
 BNS2_Checkbox = GetMultiWrappedClass(GUIMenuCheckboxWidgetLabeled, {"Option", "Tooltip"})
 BNS2_ColorPicker = GetMultiWrappedClass(GUIMenuColorPickerWidget, {"Option", "Tooltip"})
 BNS2_Dropdown = GetMultiWrappedClass(GUIMenuDropdownWidget, {"Option", "Tooltip"})
@@ -487,11 +489,53 @@ function CreateBetterNS2Menu()
     return menu
 end
 
-function SaveAlienVision()
-    Print('enter SaveAlienVision')
+function SaveAlienVision(filename)
+    Print('enter SaveAlienVision: %s', filename)
 end
 
-function LoadAlienVision()
+function HandleSaveAlienVision()
+    Print('enter HandleSaveAlienVision')
+    local filename = ''
+
+    local saveCallback = function(popup2)
+        Print('enter saveCallback')
+        popup2:Close()
+        SaveAlienVision(filename)
+    end
+
+    local popup = CreateGUIObject("popup", GUIMenuSavePromptDialog, nil,
+            {
+                title = "Save Alienvision",
+                filename = filename,
+                message = "Enter filename",
+                buttonConfig = {
+                    {
+                        name = "save",
+                        params = {
+                            label = "Save"
+                        },
+                        callback = saveCallback,
+                    },
+                    GUIMenuPopupDialog.CancelButton
+                }
+            })
+
+    local filenameEntry = popup:GetSaveFilename()
+    assert(filenameEntry)
+
+    popup:HookEvent(filenameEntry, "OnKey", function(popup2, key, down)
+        if (key == InputKey.Return or key == InputKey.NumPadEnter) and down then
+            joinCallback(popup2)
+        end
+    end)
+
+    popup:HookEvent(filenameEntry, "OnValueChanged",
+        function(popup2, value)
+            filename = value
+        end)
+end
+
+function HandleLoadAlienVision()
     Print('enter LoadAlienVision')
 end
 
@@ -551,7 +595,7 @@ BetterNS2Options = {
         postInit = function(createdObj)
             createdObj:HookEvent(createdObj, "OnPressed",
                     function()
-                        SaveAlienVision()
+                        HandleSaveAlienVision()
                     end)
             createdObj:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
                     function(self, value)
@@ -573,7 +617,7 @@ BetterNS2Options = {
         postInit = function(createdObj)
             createdObj:HookEvent(createdObj, "OnPressed",
                     function()
-                        LoadAlienVision()
+                        HandleLoadAlienVision()
                     end)
             createdObj:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
                     function(self, value)

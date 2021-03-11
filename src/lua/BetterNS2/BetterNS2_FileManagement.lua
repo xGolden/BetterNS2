@@ -1,12 +1,35 @@
 Script.Load('lua/BetterNS2/widgets/GUIMenuSavePromptDialog.lua')
 Script.Load('lua/BetterNS2/widgets/GUIMenuLoadPromptDialog.lua')
+Script.Load('lua/NS2Utility.lua')
+
+local alienvisionFilePath = "config://BetterNS2/Alienvision"
+
+local function GetAlienvisionSettings()
+    -- TODO: Get all of the alienvision options in a writeable type/format -- make sure to ignore any "button" option types
+    return {}
+end
 
 function SaveAlienVision(filename)
     Print('enter SaveAlienVision: %s', filename)
+
+    assert(filename ~= '', "Attempted to save alienvision to filename as an empty string")
+    local saveAlienvisionFilePath = string.format("%s/%s.json",alienvisionFilePath, filename)
+    local alienvisionFile = io.open(saveAlienvisionFilePath, "w+")
+    if alienvisionFile then
+        local AlienvisionOptionsJson = {
+            details = {
+                av_name = filename,
+                date_created = FormatDateTimeString(Shared.GetSystemTime())
+            },
+            settings = GetAlienvisionSettings()
+        }
+        alienvisionFile:write(json.encode(AlienvisionOptionsJson, { indent = true }))
+        Print("Saved alienvision options to %s", saveAlienvisionFilePath)
+        alienvisionFile:close()
+    end
 end
 
 function HandleSaveAlienVision()
-    Print('enter HandleSaveAlienVision')
     local filename = ''
 
     local saveCallback = function(popup2)
@@ -52,11 +75,9 @@ function LoadAlienVision(filename)
 end
 
 function HandleLoadAlienVision()
-    Print('enter HandleLoadAlienVision')
     local filename = ''
 
     local loadCallback = function(popup2)
-        Print('enter loadCallback')
         popup2:Close()
         LoadAlienVision(filename)
     end

@@ -17,11 +17,7 @@ function BetterNS2GetOption(key)
     if type(value) == "cdata" and value:isa("Color") then
         value = ColorToColorInt(value)
     elseif type(value) == "boolean" then
-        if value then
-            value = 1
-        else
-            value = 0
-        end
+        value = value and 1 or 0
     end
     return value
 end

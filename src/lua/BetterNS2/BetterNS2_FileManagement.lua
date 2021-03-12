@@ -4,9 +4,29 @@ Script.Load('lua/NS2Utility.lua')
 
 local alienvisionFilePath = "config://BetterNS2/Alienvision"
 
-local function GetAlienvisionSettings()
-    -- TODO: Get all of the alienvision options in a writeable type/format -- make sure to ignore any "button" option types
-    return {}
+local function GetBetterNS2OptionSaveSafeValue(option)
+    local value = GetOptionsMenu():GetOptionWidget(option.name):GetValue()
+    if option.optionType == "color" then
+        value = ColorToColorInt(value)
+    elseif option.optionType == "float" then
+        value = Round(value, 4)
+    elseif option.optionType == "boolean" then
+        value = value and 1 or 0
+    elseif option.optionType == "int" then
+        value = value
+    end
+    return value
+end
+
+local function GetBetterNS2OptionsByCategory(category)
+    local options = {}
+
+    for _, option in ipairs(BetterNS2Options) do
+        if option.category == category and option.optionType then
+            options[option.name] = GetBetterNS2OptionSaveSafeValue(option)
+        end
+    end
+    return options
 end
 
 function SaveAlienVision(filename)
@@ -21,7 +41,7 @@ function SaveAlienVision(filename)
                 av_name = filename,
                 date_created = FormatDateTimeString(Shared.GetSystemTime())
             },
-            settings = GetAlienvisionSettings()
+            settings = GetBetterNS2OptionsByCategory("alienvision")
         }
         alienvisionFile:write(json.encode(AlienvisionOptionsJson, { indent = true }))
         Print("Saved alienvision options to %s", saveAlienvisionFilePath)

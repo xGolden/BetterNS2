@@ -2,7 +2,8 @@ Script.Load('lua/BetterNS2/widgets/GUIMenuSavePromptDialog.lua')
 Script.Load('lua/BetterNS2/widgets/GUIMenuLoadPromptDialog.lua')
 Script.Load('lua/NS2Utility.lua')
 
-local alienvisionFilePath = "config://BetterNS2/Alienvision"
+local oldAlienvisionFilePath = "config://NS2Plus/Alienvision/"
+local alienvisionFilePath = "config://BetterNS2/Alienvision/"
 
 local function GetBetterNS2OptionSaveSafeValue(option)
     local value = GetOptionsMenu():GetOptionWidget(option.name):GetValue()
@@ -105,8 +106,9 @@ function HandleLoadAlienVision()
     local popup = CreateGUIObject("popup", GUIMenuLoadPromptDialog, nil,
             {
                 title = "Load Alienvision",
-                filename = filename,
                 message = "Select file to load",
+                filepath = alienvisionFilePath,
+                oldfilepath = oldAlienvisionFilePath,
                 buttonConfig = {
                     {
                         name = "load",

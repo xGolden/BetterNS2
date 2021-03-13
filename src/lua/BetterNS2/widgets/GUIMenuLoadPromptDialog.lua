@@ -1,5 +1,6 @@
 Script.Load("lua/menu2/popup/GUIMenuPopupDialog.lua")
 Script.Load("lua/menu2/widgets/GUIMenuDropdownWidget.lua")
+Script.Load("lua/menu/FancyUtilities.lua")
 
 ---@class GUIMenuLoadPromptDialog : GUIMenuPopupDialog
 class "GUIMenuLoadPromptDialog" (GUIMenuPopupDialog)
@@ -34,7 +35,7 @@ function GUIMenuLoadPromptDialog:Initialize(params, errorDepth)
     RequireType({"string", "nil"}, params.title, "params.title", errorDepth)
     RequireType({"string", "nil"}, params.message, "params.message", errorDepth)
     RequireType("table", params.buttonConfig, "params.buttonConfig", errorDepth)
-    RequireType({"string", "nil"}, params.filename, "params.filename", errorDepth)
+    RequireType({"string", "nil"}, params.filepath, "params.filepath", errorDepth)
 
     GUIMenuPopupDialog.Initialize(self, params, errorDepth)
 
@@ -74,8 +75,8 @@ function GUIMenuLoadPromptDialog:Initialize(params, errorDepth)
 
     self.filename = CreateGUIObject("filename", GUIMenuDropdownWidget, self.layout,
             {
-                label = "Filename",
-                choices = self:GetChoices(),
+                label = "AV Name",
+                choices = self:GetChoices(params.filepath),
             })
     self.filename:AlignTop()
 
@@ -91,24 +92,26 @@ function GUIMenuLoadPromptDialog:Initialize(params, errorDepth)
     if params.filename then
         self.filename:SetValue(params.filename)
     end
+end
 
-    -- Convenience.  Enable editing on the filename field so user doesn't have to click it.
-    self.filename:SetEditing(true)
-
+function GUIMenuLoadPromptDialog:ConvertNS2PlusFormatToBetterNS2(oldFilePath, newFilePath)
+    return
 end
 
 function GUIMenuLoadPromptDialog:GetLoadFilename()
     return self.filename
 end
 
-function GUIMenuLoadPromptDialog:GetChoices()
-    -- TODO: Lookup filenames
-    return {
-        {value = "file1path", displayString = "filename1"},
-        {value = "file2path", displayString = "filename2"},
-        {value = "file3path", displayString = "filename3"},
-        {value = "file4path", displayString = "filename4"},
-        {value = "file5path", displayString = "filename5"},
-        {value = "file6path", displayString = "filename6"},
-    }
+function GUIMenuLoadPromptDialog:GetChoices(filepath)
+    local filenames = {}
+    local choices = {}
+
+    Shared.GetMatchingFileNames(filepath .. '*.json', false, filenames)
+
+    for _, filename in ipairs(filenames) do
+        local displayName = Fancy_SplitStringIntoTable(Fancy_SplitStringIntoTable(filename, '.json')[1], '/')[3]
+        table.insert(choices, {value = 'config://'..filename, displayString = displayName})
+    end
+
+    return choices
 end

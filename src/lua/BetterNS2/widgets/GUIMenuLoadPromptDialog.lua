@@ -37,6 +37,8 @@ function GUIMenuLoadPromptDialog:Initialize(params, errorDepth)
     RequireType("table", params.buttonConfig, "params.buttonConfig", errorDepth)
     RequireType({"string", "nil"}, params.filepath, "params.filepath", errorDepth)
 
+    self:ConvertNS2PlusFormatToBetterNS2(params.oldFilepath, params.filepath)
+
     GUIMenuPopupDialog.Initialize(self, params, errorDepth)
 
     self.layout = CreateGUIObject("layout", GUIListLayout, self.contentsHolder,
@@ -88,14 +90,53 @@ function GUIMenuLoadPromptDialog:Initialize(params, errorDepth)
     self:HookEvent(self.contentsHolder, "OnSizeChanged", UpdateScrollPaneViewHeight)
     UpdateScrollPaneViewHeight(self)
     UpdateScrollPaneHeight(self)
-
-    if params.filename then
-        self.filename:SetValue(params.filename)
-    end
 end
 
 function GUIMenuLoadPromptDialog:ConvertNS2PlusFormatToBetterNS2(oldFilePath, newFilePath)
-    return
+    local ns2PlusFiles = {}
+    Shared.GetMatchingFileNames(oldFilePath..'*.json', false, ns2PlusFiles)
+
+    local existingAlienvisions = self:GetExistingBetterNS2Alienvisions(newFilePath)
+
+    for _, ns2PlusFilePath in ipairs(ns2PlusFiles) do
+        local settingsFile = io.open('config://'..ns2PlusFilePath, "r")
+        if settingsFile then
+            local ns2PlusSettings = settingsFile:read("*all")
+
+            ns2PlusSettings = string.gsub(ns2PlusSettings, "CHUD", "BETTERNS2")
+            ns2PlusSettings = string.gsub(ns2PlusSettings, "BETTERNS2_AV\":5", "BETTERNS2_AV\":\"shaders/Cr4zyAV.screenfx\"")
+
+            local betterNs2Settings, _, errStr = json.decode(ns2PlusSettings)
+
+            if not errStr then
+                local avFilename = betterNs2Settings.details['av_name']
+                if not table.contains(existingAlienvisions, avFilename) then
+                    betterNs2Settings.details['date_migrated'] = FormatDateTimeString(Shared.GetSystemTime())
+                    local newAlienvisionFile = io.open(newFilePath..avFilename..'.json', "w+")
+                    if newAlienvisionFile then
+                        newAlienvisionFile:write(json.encode(betterNs2Settings, { indent = true }))
+                    end
+                    newAlienvisionFile:close()
+                end
+            else
+                Print("Error converting file "..ns2PlusFilePath..': '..errStr)
+            end
+        else
+            settingsFile:close()
+        end
+    end
+end
+
+function GUIMenuLoadPromptDialog:GetExistingBetterNS2Alienvisions(filepath)
+    local existingAlienvisionFiles = {}
+    local existingAlienvisionFilenames = {}
+    Shared.GetMatchingFileNames(filepath..'*.json', false, existingAlienvisionFiles)
+
+    for _, existingFile in ipairs(existingAlienvisionFiles) do
+        table.insert(existingAlienvisionFilenames, Fancy_SplitStringIntoTable(Fancy_SplitStringIntoTable(existingFile, '.json')[1], '/')[3])
+    end
+
+    return existingAlienvisionFilenames
 end
 
 function GUIMenuLoadPromptDialog:GetLoadFilename()
@@ -106,7 +147,7 @@ function GUIMenuLoadPromptDialog:GetChoices(filepath)
     local filenames = {}
     local choices = {}
 
-    Shared.GetMatchingFileNames(filepath .. '*.json', false, filenames)
+    Shared.GetMatchingFileNames(filepath..'*.json', false, filenames)
 
     for _, filename in ipairs(filenames) do
         local displayName = Fancy_SplitStringIntoTable(Fancy_SplitStringIntoTable(filename, '.json')[1], '/')[3]

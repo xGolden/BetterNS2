@@ -22,6 +22,10 @@ function BetterNS2GetOption(key)
     return value
 end
 
+function BetterNS2SetOption(key, value)
+    GetOptionsMenu():GetOptionWidget(key):SetValue(value)
+end
+
 local function updateAlienVisionInGame()
     if kInGame then
         UpdateAlienVision()

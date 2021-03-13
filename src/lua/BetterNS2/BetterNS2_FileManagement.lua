@@ -11,12 +11,30 @@ local function GetBetterNS2OptionSaveSafeValue(option)
         value = ColorToColorInt(value)
     elseif option.optionType == "float" then
         value = Round(value, 4)
-    elseif option.optionType == "boolean" then
+    elseif option.optionType == "bool" then
         value = value and 1 or 0
     elseif option.optionType == "int" then
         value = value
     end
     return value
+end
+
+local function SetBetterNs2OptionWithOperationalSafeValue(optionKey, value)
+    local safeValue = value
+    for option in BetterNS2Options do
+        if option.name == optionKey then
+            if option.optionType == "color" then
+                safeValue = ColorIntToColor(value)
+            elseif option.optionType == "bool" then
+                if value == 1 then
+                    safeValue = true
+                else
+                    safeValue = false
+                end
+            end
+            return BetterNS2SetOption(optionKey, safeValue)
+        end
+    end
 end
 
 local function GetBetterNS2OptionsByCategory(category)
@@ -45,7 +63,6 @@ function SaveAlienVision(filename)
             settings = GetBetterNS2OptionsByCategory("alienvision")
         }
         alienvisionFile:write(json.encode(AlienvisionOptionsJson, { indent = true }))
-        Print("Saved alienvision options to %s", saveAlienvisionFilePath)
         alienvisionFile:close()
     end
 end
@@ -108,7 +125,7 @@ function HandleLoadAlienVision()
                 title = "Load Alienvision",
                 message = "Select file to load",
                 filepath = alienvisionFilePath,
-                oldfilepath = oldAlienvisionFilePath,
+                oldFilepath = oldAlienvisionFilePath,
                 buttonConfig = {
                     {
                         name = "load",

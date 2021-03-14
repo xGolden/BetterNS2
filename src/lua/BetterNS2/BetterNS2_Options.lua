@@ -1,7 +1,4 @@
-Script.Load("lua/menu2/widgets/GUIMenuDropdownWidget.lua")
-Script.Load("lua/menu2/widgets/GUIMenuCheckboxWidgetLabeled.lua")
-Script.Load("lua/menu2/widgets/GUIMenuSliderEntryWidget.lua")
-Script.Load("lua/menu2/widgets/GUIMenuColorPickerWidget.lua")
+Script.Load('lua/BetterNS2/BetterNS2_FileManagement.lua')
 
 BNS2_Checkbox = GetMultiWrappedClass(GUIMenuCheckboxWidgetLabeled, {"Option", "Tooltip"})
 BNS2_ColorPicker = GetMultiWrappedClass(GUIMenuColorPickerWidget, {"Option", "Tooltip"})
@@ -13,35 +10,25 @@ BNS2_Expandable_ColorPicker = GetMultiWrappedClass(GUIMenuColorPickerWidget, {"O
 BNS2_Expandable_Dropdown = GetMultiWrappedClass(GUIMenuDropdownWidget, {"Option", "Tooltip", "Expandable"})
 BNS2_Expandable_Slider = GetMultiWrappedClass(GUIMenuSliderEntryWidget, {"Option", "Tooltip", "Expandable"})
 
+BNS2_Expandable_Button = GetMultiWrappedClass(GUIMenuButton, {"Expandable"})
+
 function BetterNS2GetOption(key)
     local value = GetOptionsMenu():GetOptionWidget(key):GetValue()
     if type(value) == "cdata" and value:isa("Color") then
         value = ColorToColorInt(value)
     elseif type(value) == "boolean" then
-        if value then
-            value = 1
-        else
-            value = 0
-        end
+        value = value and 1 or 0
     end
     return value
+end
+
+function BetterNS2SetOption(key, value)
+    GetOptionsMenu():GetOptionWidget(key):SetValue(value)
 end
 
 local function updateAlienVisionInGame()
     if kInGame then
         UpdateAlienVision()
-    end
-end
-
-local function BetterNS2RestartInGameScripts(scripts)
-    if kInGame then
-        for _, currentScript in ipairs(scripts) do
-            local script = ClientUI.GetScript(currentScript)
-            if script then
-                script:Uninitialize()
-                script:Initialize()
-            end
-        end
     end
 end
 
@@ -52,6 +39,12 @@ local function BetterNS2RestartScripts(scripts)
             script:Uninitialize()
             script:Initialize()
         end
+    end
+end
+
+local function BetterNS2RestartInGameScripts(scripts)
+    if kInGame then
+        BetterNS2RestartScripts(scripts)
     end
 end
 
@@ -418,6 +411,19 @@ function PrepareExpandableSlider(option)
     return preppedOption
 end
 
+function PrepareButton(button)
+    local preppedButton = {
+        name = button.name,
+        class = BNS2_Expandable_Button,
+        properties = {
+            {"Label", button.label},
+        },
+        postInit = button.postInit,
+    }
+
+    return preppedButton
+end
+
 local factories = {
     checkbox = PrepareCheckbox,
     expandable_checkbox = PrepareExpandableCheckbox,
@@ -427,6 +433,7 @@ local factories = {
     expandable_colorpicker = PrepareExpandableColorPicker,
     slider = PrepareSlider,
     expandable_slider = PrepareExpandableSlider,
+    button = PrepareButton,
 }
 
 local function CreateBetterNS2MenuHeaders(displayHeaders)
@@ -528,6 +535,50 @@ BetterNS2Options = {
         children = { "av_colormarine", "av_marineintensity", "av_coloralien", "av_alienintensity", "av_style", "av_offstyle", "av_closecolor", "av_closeintensity", "av_distantcolor", "av_distantintensity", "av_playercolor", "av_gorgeunique", "av_structurecolor", "av_blenddistance", "av_worldintensity", "av_edges", "av_edgesize", "av_desaturation", "av_viewmodelstyle", "av_activationeffect", "av_skybox", "av_colormarinestruct", "av_mstructintensity", "av_coloralienstruct", "av_astructintensity" },
         hideValues = { 0, 1, 2, 3, 4 },
         sort = "C02",
+    },
+    {
+        name = "BETTERNS2_AVSave",
+        label = "Save",
+        type = "button",
+        category = "alienvision",
+        parent = "BETTERNS2_AV",
+        postInit = function(createdObj)
+            createdObj:HookEvent(createdObj, "OnPressed",
+                    function()
+                        HandleSaveAlienVision()
+                    end)
+            createdObj:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
+                    function(self, value)
+                        local crazyAVSelected = value == "shaders/Cr4zyAV.screenfx"
+                        self:SetExpanded(crazyAVSelected)
+                    end)
+
+            local betterns2AVValue = GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"):GetValue()
+            local crazyAVSelected = betterns2AVValue == "shaders/Cr4zyAV.screenfx"
+            createdObj:SetExpanded(crazyAVSelected)
+        end
+    },
+    {
+        name = "BETTERNS2_AVLoad",
+        label = "Load",
+        type = "button",
+        category = "alienvision",
+        parent = "BETTERNS2_AV",
+        postInit = function(createdObj)
+            createdObj:HookEvent(createdObj, "OnPressed",
+                    function()
+                        HandleLoadAlienVision()
+                    end)
+            createdObj:HookEvent(GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"), "OnValueChanged",
+                    function(self, value)
+                        local crazyAVSelected = value == "shaders/Cr4zyAV.screenfx"
+                        self:SetExpanded(crazyAVSelected)
+                    end)
+
+            local betterns2AVValue = GetOptionsMenu():GetOptionWidget("BETTERNS2_AV"):GetValue()
+            local crazyAVSelected = betterns2AVValue == "shaders/Cr4zyAV.screenfx"
+            createdObj:SetExpanded(crazyAVSelected)
+        end
     },
     {
         name = "BETTERNS2_AVStyle",

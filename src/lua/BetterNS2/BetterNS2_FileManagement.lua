@@ -4,6 +4,7 @@ Script.Load('lua/NS2Utility.lua')
 
 local oldAlienvisionFilePath = "config://NS2Plus/Alienvision/"
 local alienvisionFilePath = "config://BetterNS2/Alienvision/"
+local displayAlienvisionFilePath = "%AppData%/Natural Selection 2/BetterNS2/Alienvision"
 
 local function GetBetterNS2OptionSaveSafeValue(option)
     local value = GetOptionsMenu():GetOptionWidget(option.name):GetValue()
@@ -77,7 +78,7 @@ function HandleSaveAlienVision()
             {
                 title = "Save Alienvision",
                 filename = filename,
-                message = "Enter filename",
+                message = "File is saved to "..displayAlienvisionFilePath,
                 buttonConfig = {
                     {
                         name = "save",
@@ -132,7 +133,7 @@ function HandleLoadAlienVision()
     local popup = CreateGUIObject("popup", GUIMenuLoadPromptDialog, nil,
             {
                 title = "Load Alienvision",
-                message = "Select file to load",
+                message = "Files are located at "..displayAlienvisionFilePath,
                 filepath = alienvisionFilePath,
                 oldFilepath = oldAlienvisionFilePath,
                 buttonConfig = {

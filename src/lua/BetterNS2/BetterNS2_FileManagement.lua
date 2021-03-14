@@ -21,7 +21,7 @@ end
 
 local function SetBetterNs2OptionWithOperationalSafeValue(optionKey, value)
     local safeValue = value
-    for option in BetterNS2Options do
+    for _, option in ipairs(BetterNS2Options) do
         if option.name == optionKey then
             if option.optionType == "color" then
                 safeValue = ColorIntToColor(value)
@@ -49,8 +49,6 @@ local function GetBetterNS2OptionsByCategory(category)
 end
 
 function SaveAlienVision(filename)
-    Print('enter SaveAlienVision: %s', filename)
-
     assert(filename ~= '', "Attempted to save alienvision to filename as an empty string")
     local saveAlienvisionFilePath = string.format("%s/%s.json",alienvisionFilePath, filename)
     local alienvisionFile = io.open(saveAlienvisionFilePath, "w+")
@@ -71,7 +69,6 @@ function HandleSaveAlienVision()
     local filename = ''
 
     local saveCallback = function(popup2)
-        Print('enter saveCallback')
         popup2:Close()
         SaveAlienVision(filename)
     end
@@ -109,7 +106,19 @@ function HandleSaveAlienVision()
 end
 
 function LoadAlienVision(filename)
-    Print('enter LoadAlienVision: %s', filename)
+    local settingsFile = io.open(filename, "r")
+    if settingsFile then
+        local settingsJson = settingsFile:read("*all")
+        local betterNs2Settings, _, errStr = json.decode(settingsJson)
+
+        if not errStr then
+            for setting, value in pairs(betterNs2Settings.settings) do
+                SetBetterNs2OptionWithOperationalSafeValue(setting, value)
+            end
+        else
+            Print("Error loading settings file "..filename..": "..errStr)
+        end
+    end
 end
 
 function HandleLoadAlienVision()

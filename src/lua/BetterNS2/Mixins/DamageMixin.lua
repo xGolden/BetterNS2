@@ -77,7 +77,6 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
         if target and HasMixin(target, "Live") and damage > 0 then
 
             damage, armorUsed, healthUsed, overshieldDamage = GetDamageByType(target, attacker, doer, damage, damageType, point, weapon)
-            Print('GetDamageByType overshield: '..overshieldDamage)
 
             overshieldDamage = overshieldDamage or 0 -- Just in case mods alter damage rules in a way that this becomes nil
             rawDamage = damage + overshieldDamage
@@ -110,7 +109,6 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                             -- Damage message will be sent at the end of OnProcessMove by the HitSound system
                             HitSound_RecordHit( attacker, target, amount, point, overkill, weapon, overshieldDamage )
                         else
-                            Print('Calling SendDamageMessage with overshieldDamage: '..overshieldDamage)
                             SendDamageMessage( currentComm or attacker, targetEntityId, amount, point, overkill, overshieldDamage)
                         end
 

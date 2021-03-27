@@ -8,8 +8,6 @@ if Server then
         attacker = (attacker and attacker:GetId()) or Entity.invalidId
         target = (target and target:GetId()) or Entity.invalidId
 
-        Print('Got hit with shieldAmount: '..shieldAmount)
-
         local hit
         for i=1,#hits do
             hit = hits[i]
@@ -75,7 +73,6 @@ if Server then
 
             -- Send the accumulated damage message
             if attacker then
-                Print('Sending message for: '..hit.shieldAmount)
                 SendDamageMessage( attacker, hit.target, hit.amount, hit.point, hit.overkill, hit.shieldAmount )
             end
 

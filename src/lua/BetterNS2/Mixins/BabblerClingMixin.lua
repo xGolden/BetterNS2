@@ -6,7 +6,6 @@ function BabblerClingMixin:ModifyDamageTaken(damageTable, attacker, doer, damage
         if Server then
             self.babblerShieldRemaining = self.babblerShieldRemaining - amount
             self:DestroyNumClingedBabbler(math.floor((self.numBabblers * self.babblerShieldPerBabbler - self.babblerShieldRemaining) / self.babblerShieldPerBabbler ))
-            Print('BabblerClingMixin:ModifyDamageTaken overshield: '..amount)
             if GetAreEnemies(self, attacker) then
                 if HitSound_IsEnabledForWeapon( weapon ) then
                     -- Damage message will be sent at the end of OnProcessMove by the HitSound system

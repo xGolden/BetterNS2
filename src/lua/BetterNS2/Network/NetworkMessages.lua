@@ -23,14 +23,12 @@ end
 
 function ParseDamageMessage(message)
     local position = Vector(message.posx, message.posy, message.posz)
-    Print('Received shield damage: '..message.shieldAmount)
     return message.targetId, message.healthArmor, position, message.shieldAmount
 end
 
 function SendDamageMessage( attacker, targetEntityId, healthArmor, point, overkill, shieldAmount)
     if (healthArmor + shieldAmount) > 0 then
         shieldAmount = shieldAmount or 0
-        Print('SendDamageMessage: '..shieldAmount)
 
         local msg = BuildDamageMessage(targetEntityId, healthArmor, point, shieldAmount)
 

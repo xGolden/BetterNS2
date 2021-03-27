@@ -1,107 +1,124 @@
 Script.Load("lua/AdvancedOptions.lua")
 
-kShieldDamageNumberOffset = Vector(0, 0, 1)
+kShieldDamageNumberOffset = Vector(-1, 1, 0)
 
 Client.DamageNumberLifeTime = GetAdvancedOption("damagenumbertime")
 
-function Client.AddWorldMessage(messageType, message, position, entityId)
-    Print('Enter AddWorldMessage with messageType: '..messageType)
+local function setCommonWorldMessageProperties(position, messageType, time, entityId)
+    local worldMessage = {}
+    worldMessage.messageType = messageType
+    worldMessage.position = position
+    worldMessage.creationTime = time
+    worldMessage.entityId = entityId
+    worldMessage.animationFraction = 0
 
-    -- Only add damage messages if we have it enabled
-    if messageType ~= kWorldTextMessageType.Damage or Client.GetOptionBoolean( "drawDamage", false ) then
-        -- If we already have a message for this entity id, update existing message instead of adding new one
-        local time = Client.GetTime()
-        local updatedExisting = false
+    return worldMessage
+end
 
-        if messageType == kWorldTextMessageType.Damage then
-            for _, currentWorldMessage in ipairs(Client.worldMessages) do
-                if currentWorldMessage.messageType == messageType and currentWorldMessage.entityId == entityId and entityId ~= nil and entityId ~= Entity.invalidId then
-                    currentWorldMessage.creationTime = time
-                    currentWorldMessage.previousNumber = tonumber(currentWorldMessage.message)
+local function AddDamageWorldMessage(amount, position, healthArmorDamage, entityId)
+    local time = Client.GetTime()
+    local worldMessage = setCommonWorldMessageProperties(position, kWorldTextMessageType.Damage, time, entityId)
+    worldMessage.message = math.floor(amount)
+    worldMessage.decimalBuffer = amount - worldMessage.message
+    worldMessage.healthArmorDamage = healthArmorDamage
+    worldMessage.lifeTime = Client.DamageNumberLifeTime
 
-                    local newWholePart
-                    local newDecimalPart
-                    local newPosition
+    table.insert(Client.worldMessages, worldMessage)
+end
 
-                    -- Offset position of damage number if damage is applied to a shield
-                    -- Display only whole numbers, and save the decimal part to add later as it gets >= 1
-                    if currentWorldMessage.healthArmorDamage then
-                        newPosition = position
+local function AddNonDamageWorldMessage(message, position, entityId, messageType)
+    local time = Client.GetTime()
+    local worldMessage = setCommonWorldMessageProperties(position, messageType, time, entityId)
+    worldMessage.message = message
+    worldMessage.decimalBuffer = 0
+    worldMessage.lifeTime = kWorldMessageLifeTime
 
-                        newWholePart = math.floor(message.healthArmorDamage)
-                        newDecimalPart = message.healthArmorDamage - newWholePart
-                    else
-                        newPosition = position + kShieldDamageNumberOffset
+    if messageType == kWorldTextMessageType.CommanderError then
+        worldMessage.lifeTime = kCommanderErrorMessageLifeTime
+        local commander = Client.GetLocalPlayer()
+        if commander then
+            commander:TriggerInvalidSound()
+        end
+    end
 
-                        newWholePart = math.floor(message.shieldDamage)
-                        newDecimalPart = message.shieldDamage - newWholePart
-                    end
+    table.insert(Client.worldMessages, worldMessage)
+end
 
-                    currentWorldMessage.position = newPosition
+local function GetShieldDamageNumberPosition(position)
+    local player = Client.GetLocalPlayer()
+    local distance = (position - player:GetOrigin()):GetLength()
+    local direction = GetNormalizedVector(position - player:GetViewCoords().origin)
+    local offsetVector = (direction * distance):CrossProduct(Vector(0,0,1))
+    local offset = Vector(position.x + offsetVector.x, position.y + offsetVector.y, position.z + offsetVector.z)
+    return offset
+end
 
-                    currentWorldMessage.message = currentWorldMessage.message + newWholePart
-                    currentWorldMessage.decimalBuffer = currentWorldMessage.decimalBuffer + newDecimalPart
+local function UpdateDamageWorldMessage(messageType, message, position, entityId)
+    local time = Client.GetTime()
+    local healthArmor = message.healthArmor
+    local shield = message.shieldDamage
+    local updatedHealthArmor = false
+    local updatedShieldDamage = false
+    for _, currentWorldMessage in ipairs(Client.worldMessages) do
+        if currentWorldMessage.messageType == messageType and currentWorldMessage.entityId == entityId and entityId ~= nil and entityId ~= Entity.invalidId then
+            local newWholePart
+            local newDecimalPart
+            local newPosition
 
-                    if currentWorldMessage.decimalBuffer >= 1.0 then
-                        local extraWholePart = math.floor(currentWorldMessage.decimalBuffer)
-                        currentWorldMessage.message = currentWorldMessage.message + extraWholePart
-                        currentWorldMessage.decimalBuffer = currentWorldMessage.decimalBuffer - extraWholePart
-                    end
+            if currentWorldMessage.healthArmorDamage then
+                newPosition = position
+                currentWorldMessage.creationTime = time
+                currentWorldMessage.previousNumber = healthArmor
 
-                    currentWorldMessage.minimumAnimationFraction = kWorldDamageRepeatAnimationScalar
-                    updatedExisting = true
-                    break
-                end
+                newWholePart = math.floor(healthArmor)
+                newDecimalPart = healthArmor - newWholePart
+                updatedHealthArmor = true
+            elseif not currentWorldMessage.healthArmorDamage and shield > 0 then
+                newPosition = GetShieldDamageNumberPosition(position)
+                currentWorldMessage.creationTime = time
+                currentWorldMessage.previousNumber = shield
+
+                newWholePart = math.floor(shield)
+                newDecimalPart = shield - newWholePart
+                updatedShieldDamage = true
+            else
+                -- No more shield damage done
+                newPosition = GetShieldDamageNumberPosition(position)
+                newWholePart = 0
+                newDecimalPart = 0
+                updatedShieldDamage = true
             end
+
+            currentWorldMessage.position = newPosition
+
+            currentWorldMessage.message = currentWorldMessage.message + newWholePart
+            currentWorldMessage.decimalBuffer = currentWorldMessage.decimalBuffer + newDecimalPart
+
+            if currentWorldMessage.decimalBuffer >= 1.0 then
+                local extraWholePart = math.floor(currentWorldMessage.decimalBuffer)
+                currentWorldMessage.message = currentWorldMessage.message + extraWholePart
+                currentWorldMessage.decimalBuffer = currentWorldMessage.decimalBuffer - extraWholePart
+            end
+
+            currentWorldMessage.minimumAnimationFraction = kWorldDamageRepeatAnimationScalar
+        end
+    end
+
+    return updatedHealthArmor, updatedShieldDamage
+end
+
+function Client.AddWorldMessage(messageType, message, position, entityId)
+    if messageType ~= kWorldTextMessageType.Damage then
+        AddNonDamageWorldMessage(message, position, entityId, messageType)
+    elseif Client.GetOptionBoolean( "drawDamage", false ) then
+        local updatedHealthArmor, updatedShieldDamage = UpdateDamageWorldMessage(messageType, message, position, entityId)
+
+        if not updatedHealthArmor and message.healthArmor > 0 then
+            AddDamageWorldMessage(message.healthArmor, position, true, entityId)
         end
 
-        if not updatedExisting then
-            local worldMessage = {}
-            worldMessage.messageType = messageType
-
-            local function setCommonWorldMessageProperties(worldMessage, position, time, entityId)
-                worldMessage.position = position
-                worldMessage.creationTime = time
-                worldMessage.entityId = entityId
-                worldMessage.animationFraction = 0
-                return worldMessage
-            end
-
-            worldMessage = setCommonWorldMessageProperties(worldMessage, position, time, entityId)
-
-            -- Only Damage message types add to existing messages.
-            -- Others only have string messages.
-            if messageType == kWorldTextMessageType.Damage then
-                worldMessage.healthArmorDamage = true
-                worldMessage.message = math.floor(message.healthArmor)
-                worldMessage.decimalBuffer = (message.healthArmor - worldMessage.message)
-                worldMessage.lifeTime = Client.DamageNumberLifeTime
-
-                local shieldWorldMessage = {}
-                shieldWorldMessage.messageType = messageType
-                shieldWorldMessage = setCommonWorldMessageProperties(shieldWorldMessage, position + kShieldDamageNumberOffset, time, entityId)
-                shieldWorldMessage.healthArmorDamage = false
-                shieldWorldMessage.message = math.floor(message.shieldDamage)
-                shieldWorldMessage.decimalBuffer = (message.shieldDamage - shieldWorldMessage.message)
-                shieldWorldMessage.lifeTime = Client.DamageNumberLifeTime
-
-                table.insert(Client.worldMessages, shieldWorldMessage)
-            else
-                worldMessage.message = message
-                worldMessage.decimalBuffer = 0
-            end
-
-            if messageType == kWorldTextMessageType.CommanderError then
-                worldMessage.lifeTime = kCommanderErrorMessageLifeTime
-                local commander = Client.GetLocalPlayer()
-                if commander then
-                    commander:TriggerInvalidSound()
-                end
-            elseif messageType ~= kWorldTextMessageType.Damage then
-                worldMessage.lifeTime = kWorldMessageLifeTime
-            end
-
-            table.insert(Client.worldMessages, worldMessage)
+        if not updatedShieldDamage and message.shieldDamage > 0 then
+            AddDamageWorldMessage(message.shieldDamage, GetShieldDamageNumberPosition(position), false, entityId)
         end
     end
 end

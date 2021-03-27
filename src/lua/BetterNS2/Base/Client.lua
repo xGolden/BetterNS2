@@ -48,9 +48,8 @@ local function GetShieldDamageNumberPosition(position)
     local player = Client.GetLocalPlayer()
     local distance = (position - player:GetOrigin()):GetLength()
     local direction = GetNormalizedVector(position - player:GetViewCoords().origin)
-    local offsetVector = (direction * distance):CrossProduct(Vector(0,0,1))
-    local offset = Vector(position.x + offsetVector.x, position.y + offsetVector.y, position.z + offsetVector.z)
-    return offset
+    local offsetVector = (direction * distance):CrossProduct(Vector(0,1,0))
+    return Vector(position.x + 0.2 * offsetVector.x, position.y + offsetVector.y, position.z + offsetVector.z)
 end
 
 local function UpdateDamageWorldMessage(messageType, message, position, entityId)

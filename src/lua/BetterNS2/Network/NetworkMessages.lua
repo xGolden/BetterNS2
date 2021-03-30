@@ -44,3 +44,52 @@ function SendDamageMessage( attacker, targetEntityId, healthArmor, point, overki
 end
 
 Shared.RegisterNetworkMessage( "Damage", kDamageMessage )
+
+local kPlayerStatsMessage =
+{
+    isMarine = "boolean",
+    playerName = string.format("string (%d)", kMaxNameLength * 4 ),
+    kills = string.format("integer (0 to %d)", kMaxKills),
+    assists = string.format("integer (0 to %d)", kMaxKills),
+    deaths = string.format("integer (0 to %d)", kMaxDeaths),
+    score = string.format("integer (0 to %d)", kMaxScore),
+    accuracy = "float (0 to 100 by 0.01)",
+    accuracyOnos = "float (-1 to 100 by 0.01)",
+    pdmg = "float (0 to 524287 by 0.01)",
+    shieldDmg = "float (0 to 524287 by 0.01",
+    sdmg = "float (0 to 524287 by 0.01)",
+    minutesBuilding = "float (0 to 1023 by 0.01)",
+    minutesPlaying = "float (0 to 1023 by 0.01)",
+    minutesComm = "float (0 to 1023 by 0.01)",
+    killstreak = "integer (0 to 254)",
+    steamId = "integer",
+    hiveSkill = "integer",
+    isRookie = "boolean",
+}
+Shared.RegisterNetworkMessage("PlayerStats", kPlayerStatsMessage)
+
+local kEndStatsWeaponMessage =
+{
+    wTechId = "enum kTechId",
+    accuracy = "float (0 to 100 by 0.01)",
+    accuracyOnos = "float (-1 to 100 by 0.01)",
+    kills = string.format("integer (0 to %d)", kMaxKills),
+    teamNumber = "integer (1 to 2)",
+    pdmg = "float (0 to 524287 by 0.01)",
+    shieldDmg = "float (0 to 524287 by 0.01",
+    sdmg = "float (0 to 524287 by 0.01)",
+}
+Shared.RegisterNetworkMessage("EndStatsWeapon", kEndStatsWeaponMessage)
+
+local kDeathStatsMessage =
+{
+    lastAcc = "float (0 to 100 by 0.01)",
+    lastAccOnos = "float (-1 to 100 by 0.01)",
+    currentAcc = "float (0 to 100 by 0.01)",
+    currentAccOnos = "float (-1 to 100 by 0.01)",
+    pdmg = "float (0 to 524287 by 0.01)",
+    shieldDmg = "float (0 to 524287 by 0.01",
+    sdmg = "float (0 to 524287 by 0.01)",
+    kills = string.format("integer (0 to %d)", kMaxKills),
+}
+Shared.RegisterNetworkMessage("DeathStats", kDeathStatsMessage)

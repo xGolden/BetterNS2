@@ -6,15 +6,6 @@ function BabblerClingMixin:ModifyDamageTaken(damageTable, attacker, doer, damage
         if Server then
             self.babblerShieldRemaining = self.babblerShieldRemaining - amount
             self:DestroyNumClingedBabbler(math.floor((self.numBabblers * self.babblerShieldPerBabbler - self.babblerShieldRemaining) / self.babblerShieldPerBabbler ))
-            if GetAreEnemies(self, attacker) then
-                if HitSound_IsEnabledForWeapon( weapon ) then
-                    -- Damage message will be sent at the end of OnProcessMove by the HitSound system
-                    HitSound_RecordHit( attacker, self, 0, hitPoint, 0, weapon, amount )
-                else
-                    -- BetterNS2: SendDamageMessage passed an unused 6th param 'weapon' here, removed
-                    SendDamageMessage( attacker, self:GetId(), 0, hitPoint, 0, amount)
-                end
-            end
 
             SendMarkEnemyMessage( attacker, self, amount, weapon )
 
@@ -24,5 +15,6 @@ function BabblerClingMixin:ModifyDamageTaken(damageTable, attacker, doer, damage
         end
 
         damageTable.damage = damage - amount
+        damageTable.overshieldDamage = damageTable.overshieldDamage + amount
     end
 end

@@ -88,7 +88,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
 
             -- Get the target entity id before takedamage so we can add the killing shot damage to our damage total.
             local targetEntityId = target:GetId()
-            killedFromDamage, damageDone = target:TakeDamage(damage + overshieldDamage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, nil)
+            killedFromDamage, damageDone = target:TakeDamage(rawDamage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, nil)
 
             if rawDamage > 0 then
 
@@ -109,7 +109,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                             -- Damage message will be sent at the end of OnProcessMove by the HitSound system
                             HitSound_RecordHit( attacker, target, amount, point, overkill, weapon, overshieldDamage )
                         else
-                            SendDamageMessage( currentComm or attacker, targetEntityId, amount, point, overkill, overshieldDamage)
+                            SendDamageMessage( currentComm or attacker, targetEntityId, amount, point, overkill, overshieldDamage )
                         end
 
                         SendMarkEnemyMessage( attacker, target, amountInclOvershield, weapon )

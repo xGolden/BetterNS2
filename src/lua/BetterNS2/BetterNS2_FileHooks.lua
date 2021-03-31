@@ -3,7 +3,6 @@ ModLoader.SetupFileHook("lua/menu2/NavBar/Screens/Options/Mods/ModsMenuData.lua"
 ModLoader.SetupFileHook("lua/GUIFeedback.lua", "lua/BetterNS2/GUI/DisplayVersion.lua", "post")
 ModLoader.SetupFileHook("lua/GUIAlienHUD.lua", "lua/BetterNS2/GUI/GUIAlienHUD.lua", "post")
 ModLoader.SetupFileHook("lua/GUIWorldText.lua", "lua/BetterNS2/GUI/GUIWorldText.lua", "post")
-ModLoader.SetupFileHook("lua/GUIDeathStats.lua", "lua/BetterNS2/GUI/GUIDeathStats.lua", "post")
 
 -- Damage
 ModLoader.SetupFileHook("lua/DamageTypes.lua", "lua/BetterNS2/Damage/DamageTypes.lua", "post")
@@ -20,6 +19,8 @@ ModLoader.SetupFileHook("lua/NetworkMessages_Client.lua", "lua/BetterNS2/Network
 
 -- Stats
 ModLoader.SetupFileHook("lua/ServerStats.lua", "lua/BetterNS2/Stats/ServerStats.lua", "replace")
+ModLoader.SetupFileHook("lua/GUIDeathStats.lua", "lua/BetterNS2/Stats/GUIDeathStats.lua", "replace")
+ModLoader.SetupFileHook("lua/GUIGameEndStats.lua", "lua/BetterNS2/Stats/GUIGameEndStats.lua", "replace")
 
 ModLoader.SetupFileHook("lua/Player_Client.lua", "lua/BetterNS2/Base/Player_Client.lua", "post")
 ModLoader.SetupFileHook("lua/PostLoadMod.lua", "lua/BetterNS2/PostLoad.lua", "pre")

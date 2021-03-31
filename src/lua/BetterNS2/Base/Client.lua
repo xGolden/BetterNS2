@@ -1,7 +1,5 @@
 Script.Load("lua/AdvancedOptions.lua")
 
-kShieldDamageNumberOffset = Vector(-1, 1, 0)
-
 Client.DamageNumberLifeTime = GetAdvancedOption("damagenumbertime")
 
 local function setCommonWorldMessageProperties(position, messageType, time, entityId)
@@ -44,15 +42,6 @@ local function AddNonDamageWorldMessage(message, position, entityId, messageType
     table.insert(Client.worldMessages, worldMessage)
 end
 
-local function GetShieldDamageNumberPosition(position)
-    --local player = Client.GetLocalPlayer()
-    --local distance = (position - player:GetOrigin()):GetLength()
-    --local direction = GetNormalizedVector(position - player:GetViewCoords().origin)
-    --local offsetVector = (direction * distance):CrossProduct(Vector(0,1,0))
-    --return Vector(position.x + 0.2 * offsetVector.x, position.y + offsetVector.y, position.z + offsetVector.z)
-    return position
-end
-
 local function UpdateDamageWorldMessage(messageType, message, position, entityId)
     local time = Client.GetTime()
     local healthArmor = message.healthArmor
@@ -74,7 +63,7 @@ local function UpdateDamageWorldMessage(messageType, message, position, entityId
                 newDecimalPart = healthArmor - newWholePart
                 updatedHealthArmor = true
             elseif not currentWorldMessage.healthArmorDamage and shield > 0 then
-                newPosition = GetShieldDamageNumberPosition(position)
+                newPosition = position
                 currentWorldMessage.creationTime = time
                 currentWorldMessage.previousNumber = shield
 
@@ -83,7 +72,7 @@ local function UpdateDamageWorldMessage(messageType, message, position, entityId
                 updatedShieldDamage = true
             else
                 -- No more shield damage done
-                newPosition = GetShieldDamageNumberPosition(position)
+                newPosition = position
                 newWholePart = 0
                 newDecimalPart = 0
                 updatedShieldDamage = true
@@ -118,7 +107,7 @@ function Client.AddWorldMessage(messageType, message, position, entityId)
         end
 
         if not updatedShieldDamage and message.shieldDamage > 0 then
-            AddDamageWorldMessage(message.shieldDamage, GetShieldDamageNumberPosition(position), false, entityId)
+            AddDamageWorldMessage(message.shieldDamage, position, false, entityId)
         end
     end
 end

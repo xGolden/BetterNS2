@@ -18,7 +18,6 @@ function BuildDamageMessage(targetEntityId, healthArmor, hitpos, shieldAmount)
     t.targetId = (targetEntityId or Entity.invalidId)
     t.shieldAmount = math.min( math.max( shieldAmount, 0 ), 512 )
     return t
-
 end
 
 function ParseDamageMessage(message)
@@ -27,9 +26,8 @@ function ParseDamageMessage(message)
 end
 
 function SendDamageMessage( attacker, targetEntityId, healthArmor, point, overkill, shieldAmount)
+    shieldAmount = shieldAmount or 0
     if (healthArmor + shieldAmount) > 0 then
-        shieldAmount = shieldAmount or 0
-
         local msg = BuildDamageMessage(targetEntityId, healthArmor, point, shieldAmount)
 
         -- damage reports must always be reliable when not spectating

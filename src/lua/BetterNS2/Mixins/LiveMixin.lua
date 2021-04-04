@@ -12,9 +12,11 @@ local function SetLastDamage(self, time, attacker)
 
 end
 
-function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, preventAlert)
+function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, preventAlert, shieldDamage)
+    shieldDamage = shieldDamage or 0
     -- Use AddHealth to give health.
     assert(damage >= 0)
+    assert(shieldDamage >= 0)
 
     local killedFromDamage = false
     local oldHealth = self:GetHealth()
@@ -118,13 +120,12 @@ function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUse
             -- it will count as an attack for the last person that shot it, only log actual attacks
             if attackerTeam ~= targetTeam and damage and doer then
                 if self:isa("Player") and not (self:isa("Hallucination") or self.isHallucination) then
-                    local shieldDamageDone = damage - damageDone
-                    StatsUI_AddPlayerDamageStat(attackerSteamId, damageDone or 0, attackerWeapon, attackerTeam)
-                    if shieldDamageDone > 0 then
-                        StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamageDone, attackerWeapon, attackerTeam)
+                    StatsUI_AddPlayerDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
+                    if shieldDamage > 0 then
+                        StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
                     end
                 else
-                    StatsUI_AddStructureDamageStat(attackerSteamId, damageDone or 0, attackerWeapon, attackerTeam)
+                    StatsUI_AddStructureDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
                 end
             end
         end

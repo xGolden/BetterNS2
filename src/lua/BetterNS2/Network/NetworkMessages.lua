@@ -31,17 +31,17 @@ function SendDamageMessage( attacker, targetEntityId, healthArmor, point, overki
         local msg = BuildDamageMessage(targetEntityId, healthArmor, point, shieldAmount)
 
         -- damage reports must always be reliable when not spectating
-        Server.SendNetworkMessage(attacker, "Damage", msg, true)
+        Server.SendNetworkMessage(attacker, "CompositeDamage", msg, true)
 
         for _, spectator in ientitylist(Shared.GetEntitiesWithClassname("Spectator")) do
             if attacker == Server.GetOwner(spectator):GetSpectatingPlayer() then
-                Server.SendNetworkMessage(spectator, "Damage", msg, false)
+                Server.SendNetworkMessage(spectator, "CompositeDamage", msg, false)
             end
         end
     end
 end
 
-Shared.RegisterNetworkMessage( "Damage", kDamageMessage )
+Shared.RegisterNetworkMessage( "CompositeDamage", kDamageMessage )
 
 local kPlayerStatsMessage =
 {

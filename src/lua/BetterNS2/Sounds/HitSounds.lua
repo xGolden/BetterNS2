@@ -4,7 +4,8 @@ if Server then
     local kHitSoundHighXenoHitCount = 4
     local kHitSoundMidXenoHitCount = 2
 
-    function HitSound_RecordHit( attacker, target, amount, point, overkill, weapon, shieldAmount )
+    function HitSound_RecordHit( attacker, target, amount, point, overkill, weapon, shieldDamage )
+        local shieldAmount = shieldDamage or 0
         attacker = (attacker and attacker:GetId()) or Entity.invalidId
         target = (target and target:GetId()) or Entity.invalidId
 

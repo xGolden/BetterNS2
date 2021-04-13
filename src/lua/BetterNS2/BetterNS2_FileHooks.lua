@@ -23,5 +23,6 @@ ModLoader.SetupFileHook("lua/ServerStats.lua", "lua/BetterNS2/Stats/ServerStats.
 ModLoader.SetupFileHook("lua/GUIDeathStats.lua", "lua/BetterNS2/Stats/GUIDeathStats.lua", "replace")
 ModLoader.SetupFileHook("lua/GUIGameEndStats.lua", "lua/BetterNS2/Stats/GUIGameEndStats.lua", "replace")
 
+-- Base
 ModLoader.SetupFileHook("lua/Player_Client.lua", "lua/BetterNS2/Base/Player_Client.lua", "post")
 ModLoader.SetupFileHook("lua/PostLoadMod.lua", "lua/BetterNS2/PostLoad.lua", "pre")

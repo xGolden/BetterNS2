@@ -1,4 +1,4 @@
-kBetterNS2Version = 5
+kBetterNS2Version = 6
 
 local originalFeedbackInit = GUIFeedback.Initialize
 function  GUIFeedback:Initialize()

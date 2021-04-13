@@ -1,22 +1,8 @@
-local function SetLastDamage(self, time, attacker)
+local SetLastDamage = debug.getupvaluex(LiveMixin.TakeDamage, "SetLastDamage", true)
 
-    if attacker and attacker.GetId then
-
-        self.timeOfLastDamage = time
-        self.lastDamageAttackerId = attacker:GetId()
-
-    end
-
-    -- Track "combat" (for now only take damage, since we don't make a difference between harmful and passive abilities):
-    self.timeLastCombatAction = Shared.GetTime()
-
-end
-
-function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, preventAlert, shieldDamage)
-    shieldDamage = shieldDamage or 0
+function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, preventAlert)
     -- Use AddHealth to give health.
     assert(damage >= 0)
-    assert(shieldDamage >= 0)
 
     local killedFromDamage = false
     local oldHealth = self:GetHealth()
@@ -121,9 +107,6 @@ function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUse
             if attackerTeam ~= targetTeam and damage and doer then
                 if self:isa("Player") and not (self:isa("Hallucination") or self.isHallucination) then
                     StatsUI_AddPlayerDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
-                    if shieldDamage > 0 then
-                        StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
-                    end
                 else
                     StatsUI_AddStructureDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
                 end

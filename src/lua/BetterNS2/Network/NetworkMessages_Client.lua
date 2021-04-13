@@ -11,4 +11,4 @@ function OnCommandDamage(message)
     )
 end
 
-Client.HookNetworkMessage("CompositeDamage", OnCommandDamage)
+Client.HookNetworkMessage("Damage", OnCommandDamage)

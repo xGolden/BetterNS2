@@ -1,3 +1,8 @@
+local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
+    local attackerSteamId, attackerWeapon, attackerTeam = StatsUI_GetAttackerWeapon(attacker, doer)
+    StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
+end
+
 function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode, showtracer)
 
     -- No prediction if the Client is spectating another player.
@@ -88,7 +93,11 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
 
             -- Get the target entity id before takedamage so we can add the killing shot damage to our damage total.
             local targetEntityId = target:GetId()
-            killedFromDamage, damageDone = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, nil, overshieldDamage)
+            killedFromDamage, damageDone = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType, nil)
+
+            if overshieldDamage > 0 and Server then
+                saveStatsForShieldDamage(attacker, doer, overshieldDamage)
+            end
 
             if rawDamage > 0 then
 

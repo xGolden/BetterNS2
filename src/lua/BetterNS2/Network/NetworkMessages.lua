@@ -1,3 +1,10 @@
+local RegisterNetworkMessage
+
+if Shine then
+    RegisterNetworkMessage = debug.getupvaluex(Shared.RegisterNetworkMessage, "OriginalRegisterNetworkMessage", false)
+else
+    RegisterNetworkMessage = Shared.RegisterNetworkMessage
+end
 --For damage numbers
 local kDamageMessage =
 {
@@ -31,17 +38,17 @@ function SendDamageMessage( attacker, targetEntityId, healthArmor, point, overki
         local msg = BuildDamageMessage(targetEntityId, healthArmor, point, shieldAmount)
 
         -- damage reports must always be reliable when not spectating
-        Server.SendNetworkMessage(attacker, "CompositeDamage", msg, true)
+        Server.SendNetworkMessage(attacker, "Damage", msg, true)
 
         for _, spectator in ientitylist(Shared.GetEntitiesWithClassname("Spectator")) do
             if attacker == Server.GetOwner(spectator):GetSpectatingPlayer() then
-                Server.SendNetworkMessage(spectator, "CompositeDamage", msg, false)
+                Server.SendNetworkMessage(spectator, "Damage", msg, false)
             end
         end
     end
 end
 
-Shared.RegisterNetworkMessage( "CompositeDamage", kDamageMessage )
+RegisterNetworkMessage( "Damage", kDamageMessage )
 
 local kPlayerStatsMessage =
 {
@@ -64,7 +71,7 @@ local kPlayerStatsMessage =
     hiveSkill = "integer",
     isRookie = "boolean",
 }
-Shared.RegisterNetworkMessage("PlayerStats", kPlayerStatsMessage)
+RegisterNetworkMessage("PlayerStats", kPlayerStatsMessage)
 
 local kEndStatsWeaponMessage =
 {
@@ -77,7 +84,7 @@ local kEndStatsWeaponMessage =
     shieldDmg = "float (0 to 524287 by 0.01",
     sdmg = "float (0 to 524287 by 0.01)",
 }
-Shared.RegisterNetworkMessage("EndStatsWeapon", kEndStatsWeaponMessage)
+RegisterNetworkMessage("EndStatsWeapon", kEndStatsWeaponMessage)
 
 local kDeathStatsMessage =
 {
@@ -90,4 +97,4 @@ local kDeathStatsMessage =
     sdmg = "float (0 to 524287 by 0.01)",
     kills = string.format("integer (0 to %d)", kMaxKills),
 }
-Shared.RegisterNetworkMessage("DeathStats", kDeathStatsMessage)
+RegisterNetworkMessage("DeathStats", kDeathStatsMessage)

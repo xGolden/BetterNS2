@@ -1,6 +1,6 @@
 local RegisterNetworkMessage
 
-if Shine then
+if isShineLoaded() then
     RegisterNetworkMessage = debug.getupvaluex(Shared.RegisterNetworkMessage, "OriginalRegisterNetworkMessage", false)
 else
     RegisterNetworkMessage = Shared.RegisterNetworkMessage

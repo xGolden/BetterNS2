@@ -1,3 +1,5 @@
+local compModLoaded = isCompModLoaded()
+
 local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
     local attackerSteamId, attackerWeapon, attackerTeam = StatsUI_GetAttackerWeapon(attacker, doer)
     StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
@@ -167,7 +169,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                     surface = "metal"
                 end
 
-            elseif target:isa("Marine") and target.variant and table.icontains( kRoboticMarineVariantIds, target.variant) then
+            elseif not compModLoaded and target:isa("Marine") and target.variant and table.icontains( kRoboticMarineVariantIds, target.variant) then
                 surface = "robot"
 
             elseif not surface or surface == "" then

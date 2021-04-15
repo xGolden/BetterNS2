@@ -1,4 +1,4 @@
-kBetterNS2Version = 6
+kBetterNS2Version = 7
 
 function isCompModLoaded()
     print("Compmod version: "..g_compModRevision)

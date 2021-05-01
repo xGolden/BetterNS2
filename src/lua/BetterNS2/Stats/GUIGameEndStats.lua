@@ -361,7 +361,7 @@ function GUIGameEndStats:CreateTeamBackground(teamNumber)
 end
 
 -- Todo: Add score row
-local function CreateScoreboardRow(container, bgColor, textColor, playerName, kills, assists, deaths, acc, pdmg, shieldDmg, sdmg, timeBuilding, timePlayed, timeComm, steamId, isRookie, hiveSkill)
+local function CreateScoreboardRow(container, bgColor, textColor, playerName, kills, assists, deaths, acc, pdmg, shield, sdmg, timeBuilding, timePlayed, timeComm, steamId, isRookie, hiveSkill)
 
     local containerSize = container:GetSize()
     container:SetSize(Vector(containerSize.x, containerSize.y + kRowSize.y, 0))
@@ -474,19 +474,20 @@ local function CreateScoreboardRow(container, bgColor, textColor, playerName, ki
 
     xOffset = xOffset - kItemSize - kItemPaddingSmallMedium
 
-    item.shieldDmg = GUIManager:CreateTextItem()
-    item.shieldDmg:SetStencilFunc(GUIItem.NotEqual)
-    item.shieldDmg:SetFontName(kRowFontName)
-    item.shieldDmg:SetColor(textColor)
-    item.shieldDmg:SetScale(scaledVector)
-    GUIMakeFontScale(item.shieldDmg)
-    item.shieldDmg:SetAnchor(GUIItem.Left, GUIItem.Center)
-    item.shieldDmg:SetTextAlignmentY(GUIItem.Align_Center)
-    item.shieldDmg:SetTextAlignmentX(GUIItem.Align_Max)
-    item.shieldDmg:SetPosition(Vector(xOffset, 0, 0))
-    item.shieldDmg:SetText(shieldDmg or "")
-    item.shieldDmg:SetLayer(kGUILayerMainMenu)
-    item.background:AddChild(item.shieldDmg)
+    -- SPLIT HERE
+    item.shield = GUIManager:CreateTextItem()
+    item.shield:SetStencilFunc(GUIItem.NotEqual)
+    item.shield:SetFontName(kRowFontName)
+    item.shield:SetColor(textColor)
+    item.shield:SetScale(scaledVector)
+    GUIMakeFontScale(item.shield)
+    item.shield:SetAnchor(GUIItem.Left, GUIItem.Center)
+    item.shield:SetTextAlignmentY(GUIItem.Align_Center)
+    item.shield:SetTextAlignmentX(GUIItem.Align_Max)
+    item.shield:SetPosition(Vector(xOffset, 0, 0))
+    item.shield:SetText(shield or "")
+    item.shield:SetLayer(kGUILayerMainMenu)
+    item.background:AddChild(item.shield)
 
     xOffset = xOffset - kItemSize - kItemPaddingSmallMedium
 
@@ -675,7 +676,7 @@ function GUIGameEndStats:CreateGraphicHeader(text, color, logoTexture, logoCoord
     return item
 end
 
-local function CreateHeaderRow(container, bgColor, textColor, leftText, rightText)
+local function CreateTwoColumnRow(container, bgColor, textColor, leftText, rightText)
 
     local containerSize = container:GetSize()
     container:SetSize(Vector(containerSize.x, containerSize.y + kCardRowSize.y, 0))
@@ -721,6 +722,66 @@ local function CreateHeaderRow(container, bgColor, textColor, leftText, rightTex
 
     return item
 
+end
+
+local function CreateThreeColumnRow(container, bgColor, textColor, leftText, middleText, rightText)
+    local containerSize = container:GetSize()
+    container:SetSize(Vector(containerSize.x, containerSize.y + kCardRowSize.y, 0))
+
+    local item = {}
+
+    item.background = GUIManager:CreateGraphicItem()
+    item.background:SetStencilFunc(GUIItem.NotEqual)
+    item.background:SetColor(bgColor)
+    item.background:SetAnchor(GUIItem.Left, GUIItem.Top)
+    item.background:SetPosition(Vector(kRowBorderSize, containerSize.y - kRowBorderSize, 0))
+    item.background:SetLayer(kGUILayerMainMenu)
+    item.background:SetSize(kCardRowSize)
+
+    container:AddChild(item.background)
+
+    item.leftText = GUIManager:CreateTextItem()
+    item.leftText:SetStencilFunc(GUIItem.NotEqual)
+    item.leftText:SetFontName(kRowFontName)
+    item.leftText:SetColor(textColor)
+    item.leftText:SetScale(scaledVector)
+    GUIMakeFontScale(item.leftText)
+    item.leftText:SetAnchor(GUIItem.Left, GUIItem.Center)
+    item.leftText:SetTextAlignmentY(GUIItem.Align_Center)
+    item.leftText:SetPosition(Vector(GUILinearScale(5), 0, 0))
+    item.leftText:SetText(leftText or "")
+    item.leftText:SetLayer(kGUILayerMainMenu)
+    item.background:AddChild(item.leftText)
+
+    item.middleText = GUIManager:CreateTextItem()
+    item.middleText:SetStencilFunc(GUIItem.NotEqual)
+    item.middleText:SetFontName(kRowFontName)
+    item.middleText:SetColor(textColor)
+    item.middleText:SetScale(scaledVector)
+    GUIMakeFontScale(item.middleText)
+    item.middleText:SetAnchor(GUIItem.Middle, GUIItem.Center)
+    item.middleText:SetTextAlignmentX(GUIItem.Align_Max)
+    item.middleText:SetTextAlignmentY(GUIItem.Align_Center)
+    item.middleText:SetPosition(Vector(GUILinearScale(50), 0, 0))
+    item.middleText:SetText(middleText or "")
+    item.middleText:SetLayer(kGUILayerMainMenu)
+    item.background:AddChild(item.middleText)
+
+    item.rightText = GUIManager:CreateTextItem()
+    item.rightText:SetStencilFunc(GUIItem.NotEqual)
+    item.rightText:SetFontName(kRowFontName)
+    item.rightText:SetColor(textColor)
+    item.rightText:SetScale(scaledVector)
+    GUIMakeFontScale(item.rightText)
+    item.rightText:SetAnchor(GUIItem.Right, GUIItem.Center)
+    item.rightText:SetTextAlignmentX(GUIItem.Align_Max)
+    item.rightText:SetTextAlignmentY(GUIItem.Align_Center)
+    item.rightText:SetPosition(Vector(-GUILinearScale(5), 0, 0))
+    item.rightText:SetText(rightText or "")
+    item.rightText:SetLayer(kGUILayerMainMenu)
+    item.background:AddChild(item.rightText)
+
+    return item
 end
 
 function GUIGameEndStats:CreateTechLogHeader(teamNumber, teamName)
@@ -1210,7 +1271,7 @@ function GUIGameEndStats:Initialize()
     table.insert(self.team1UI.playerRows, CreateScoreboardRow(self.team1UI.tableBackground, kHeaderRowColor, kMarineHeaderRowTextColor, "Player name", "K", "A", "D", ConditionalValue(avgAccTable.marineOnosAcc == -1, "Accuracy", "Acc. (No Onos)"), "Pl. dmg", "Sh. dmg", "Str. dmg", "Build time", "Played"))
     self.team2UI = self:CreateTeamBackground(2)
     self.team2UI.playerRows = {}
-    table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kHeaderRowColor, kAlienHeaderRowTextColor, "Player name", "K", "A", "D", "Accuracy", "Pl. dmg", "Sh. dmg", "Str. dmg", "Build time", "Played"))
+    table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kHeaderRowColor, kAlienHeaderRowTextColor, "Player name", "K", "A", "D", "Accuracy", "Pl. dmg", "Sh. abs", "Str. dmg", "Build time", "Played"))
 
     self.sliderBarBg = GUIManager:CreateGraphicItem()
     self.sliderBarBg:SetColor(Color(0,0,0,0.5))
@@ -1949,15 +2010,17 @@ function GUIGameEndStats:ProcessStats()
                     if a.deaths == b.deaths then
                         if a.realAccuracy == b.realAccuracy then
                             if a.pdmg == b.pdmg then
-                                if a.shieldDmg == b.shieldDmg then
+                                if (a.teamNumber == 1 and a.shieldDmg == b.shieldDmg) or (a.teamNumber == 2 and a.shieldAbsorbed == b.shieldAbsorbed) then
                                     if a.sdmg == b.sdmg then
                                         if a.minutesBuilding == b.minutesBuilding then
                                             return a.lowerCaseName < b.lowerCaseName
                                         else
                                             return a.minutesBuilding > b.minutesBuilding
                                         end
-                                    else
+                                    elseif a.teamNumber == 1 then
                                         return a.sdmg > b.sdmg
+                                    elseif a.teamNumber == 2 then
+                                        return a.shieldAbsorbed > b.shieldAbsorbed
                                     end
                                 else
                                     return a.shieldDmg > b.shieldDmg
@@ -2008,8 +2071,8 @@ function GUIGameEndStats:ProcessStats()
     local totalDeaths2 = 0
     local totalPdmg1 = 0
     local totalPdmg2 = 0
-    local totalShieldDmg1 = 0
-    local totalShieldDmg2 = 0
+    local totalShieldDmg = 0
+    local totalShieldAbsorbed = 0
     local totalSdmg1 = 0
     local totalSdmg2 = 0
     local totalTimeBuilding1 = 0
@@ -2038,6 +2101,7 @@ function GUIGameEndStats:ProcessStats()
         message.accuracyOnos = message.accuracyOnos or -1
         message.pdmg = message.pdmg or 0
         message.shieldDmg = message.shieldDmg or 0
+        message.shieldAbsorbed = message.shieldAbsorbed or 0
         message.sdmg = message.sdmg or 0
         message.minutesBuilding = message.minutesBuilding or 0
         message.minutesPlaying = message.minutesPlaying or 0
@@ -2071,7 +2135,7 @@ function GUIGameEndStats:ProcessStats()
             totalAssists1 = totalAssists1 + message.assists
             totalDeaths1 = totalDeaths1 + message.deaths
             totalPdmg1 = totalPdmg1 + message.pdmg
-            totalShieldDmg1 = totalShieldDmg1 + message.shieldDmg
+            totalShieldDmg = totalShieldDmg + message.shieldDmg
             totalSdmg1 = totalSdmg1 + message.sdmg
             totalTimeBuilding1 = totalTimeBuilding1 + message.minutesBuilding
             totalTimePlaying1 = totalTimePlaying1 + message.minutesPlaying
@@ -2083,7 +2147,7 @@ function GUIGameEndStats:ProcessStats()
             totalAssists2 = totalAssists2 + message.assists
             totalDeaths2 = totalDeaths2 + message.deaths
             totalPdmg2 = totalPdmg2 + message.pdmg
-            totalShieldDmg2 = totalShieldDmg2 + message.shieldDmg
+            totalShieldAbsorbed = totalShieldAbsorbed + message.shieldAbsorbed
             totalSdmg2 = totalSdmg2 + message.sdmg
             totalTimeBuilding2 = totalTimeBuilding2 + message.minutesBuilding
             totalTimePlaying2 = totalTimePlaying2 + message.minutesPlaying
@@ -2103,7 +2167,7 @@ function GUIGameEndStats:ProcessStats()
             playerTextColor = kCurrentPlayerStatsTextColor
         end
 
-        table.insert(teamObj.playerRows, CreateScoreboardRow(teamObj.tableBackground, bgColor, playerTextColor, message.playerName, printNum(message.kills), printNum(message.assists), printNum(message.deaths), message.accuracyOnos == -1 and string.format("%s%%", printNum(message.accuracy)) or string.format("%s%% (%s%%)", printNum(message.accuracy), printNum(message.accuracyOnos)), printNum2(message.pdmg), printNum2(message.shieldDmg), printNum2(message.sdmg), string.format("%d:%02d", minutes, seconds), string.format("%d:%02d", pMinutes, pSeconds), message.minutesComm > 0 and string.format("%d:%02d", cMinutes, cSeconds) or nil, message.steamId, message.isRookie, message.hiveSkill))
+        table.insert(teamObj.playerRows, CreateScoreboardRow(teamObj.tableBackground, bgColor, playerTextColor, message.playerName, printNum(message.kills), printNum(message.assists), printNum(message.deaths), message.accuracyOnos == -1 and string.format("%s%%", printNum(message.accuracy)) or string.format("%s%% (%s%%)", printNum(message.accuracy), printNum(message.accuracyOnos)), printNum2(message.pdmg), printNum2((message.isMarine and message.shieldDmg) or (not message.isMarine and message.shieldAbsorbed)), printNum2(message.sdmg), string.format("%d:%02d", minutes, seconds), string.format("%d:%02d", pMinutes, pSeconds), message.minutesComm > 0 and string.format("%d:%02d", cMinutes, cSeconds) or nil, message.steamId, message.isRookie, message.hiveSkill))
         -- Store some of the original info so we can sort afterwards
         teamObj.playerRows[#teamObj.playerRows].originalOrder = playerCount
         teamObj.playerRows[#teamObj.playerRows].message = message
@@ -2168,12 +2232,12 @@ function GUIGameEndStats:ProcessStats()
     -- When there's only one player in a team, the total and the average will be the same
     -- Don't even bother displaying this, it looks odd
     if numPlayers1 > 1 then
-        table.insert(self.team1UI.playerRows, CreateScoreboardRow(self.team1UI.tableBackground, kHeaderRowColor, kMarineHeaderRowTextColor, "Total", printNum(totalKills1), printNum(totalAssists1), printNum(totalDeaths1), " ", printNum2(totalPdmg1), printNum2(totalShieldDmg1), printNum2(totalSdmg1), string.format("%d:%02d", minutes1, seconds1)))
-        table.insert(self.team1UI.playerRows, CreateScoreboardRow(self.team1UI.tableBackground, kAverageRowColor, kAverageRowTextColor, "Average", printNum(totalKills1/numPlayers1), printNum(totalAssists1/numPlayers1), printNum(totalDeaths1/numPlayers1), avgAccuracy1Onos == -1 and string.format("%s%%", printNum(avgAccuracy1)) or string.format("%s%% (%s%%)", printNum(avgAccuracy1), printNum(avgAccuracy1Onos)), printNum2(totalPdmg1/numPlayers1), printNum2(totalShieldDmg1/numPlayers1), printNum2(totalSdmg1/numPlayers1), string.format("%d:%02d", minutes1Avg, seconds1Avg), string.format("%d:%02d", minutes1PAvg, seconds1PAvg)))
+        table.insert(self.team1UI.playerRows, CreateScoreboardRow(self.team1UI.tableBackground, kHeaderRowColor, kMarineHeaderRowTextColor, "Total", printNum(totalKills1), printNum(totalAssists1), printNum(totalDeaths1), " ", printNum2(totalPdmg1), printNum2(totalShieldDmg), printNum2(totalSdmg1), string.format("%d:%02d", minutes1, seconds1)))
+        table.insert(self.team1UI.playerRows, CreateScoreboardRow(self.team1UI.tableBackground, kAverageRowColor, kAverageRowTextColor, "Average", printNum(totalKills1/numPlayers1), printNum(totalAssists1/numPlayers1), printNum(totalDeaths1/numPlayers1), avgAccuracy1Onos == -1 and string.format("%s%%", printNum(avgAccuracy1)) or string.format("%s%% (%s%%)", printNum(avgAccuracy1), printNum(avgAccuracy1Onos)), printNum2(totalPdmg1/numPlayers1), printNum2(totalShieldDmg/numPlayers1), printNum2(totalSdmg1/numPlayers1), string.format("%d:%02d", minutes1Avg, seconds1Avg), string.format("%d:%02d", minutes1PAvg, seconds1PAvg)))
     end
     if numPlayers2 > 1 then
-        table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kHeaderRowColor, kAlienHeaderRowTextColor, "Total", printNum(totalKills2), printNum(totalAssists2), printNum(totalDeaths2), " ", printNum2(totalPdmg2), printNum2(totalShieldDmg2), printNum2(totalSdmg2), string.format("%d:%02d", minutes2, seconds2)))
-        table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kAverageRowColor, kAverageRowTextColor, "Average", printNum(totalKills2/numPlayers2), printNum(totalAssists2/numPlayers2), printNum(totalDeaths2/numPlayers2), string.format("%s%%", printNum(avgAccuracy2)), printNum2(totalPdmg2/numPlayers2), printNum2(totalShieldDmg2/numPlayers2), printNum2(totalSdmg2/numPlayers2), string.format("%d:%02d", minutes2Avg, seconds2Avg), string.format("%d:%02d", minutes2PAvg, seconds2PAvg)))
+        table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kHeaderRowColor, kAlienHeaderRowTextColor, "Total", printNum(totalKills2), printNum(totalAssists2), printNum(totalDeaths2), " ", printNum2(totalPdmg2), printNum2(totalShieldAbsorbed), printNum2(totalSdmg2), string.format("%d:%02d", minutes2, seconds2)))
+        table.insert(self.team2UI.playerRows, CreateScoreboardRow(self.team2UI.tableBackground, kAverageRowColor, kAverageRowTextColor, "Average", printNum(totalKills2/numPlayers2), printNum(totalAssists2/numPlayers2), printNum(totalDeaths2/numPlayers2), string.format("%s%%", printNum(avgAccuracy2)), printNum2(totalPdmg2/numPlayers2), printNum2(totalShieldAbsorbed/numPlayers2), printNum2(totalSdmg2/numPlayers2), string.format("%d:%02d", minutes2Avg, seconds2Avg), string.format("%d:%02d", minutes2PAvg, seconds2PAvg)))
     end
 
     local gameInfo = GetGameInfoEntity()
@@ -2188,6 +2252,7 @@ function GUIGameEndStats:ProcessStats()
     self.serverName:SetText(string.format("Server name: %s", miscDataTable.serverName))
     self.mapName:SetText(string.format("Map: %s", miscDataTable.mapName))
 
+    -- sort by shieldAbsorbed for aliens here if determined necessary
     if #statusSummaryTable > 0 then
         table.sort(statusSummaryTable, function(a, b)
             if a.timeMinutes == b.timeMinutes then
@@ -2198,22 +2263,39 @@ function GUIGameEndStats:ProcessStats()
         end)
 
         local bgColor = kStatusStatsColor
-        local statCard = self:CreateGraphicHeader("Class time distribution", bgColor)
+        local statCard = self:CreateGraphicHeader("Classes played", bgColor)
         statCard.rows = {}
         statCard.teamNumber = -2
-
+        local anyShieldAbsorbed = false
         local totalTime = 0
         for _, row in ipairs(statusSummaryTable) do
             totalTime = totalTime + row.timeMinutes
+            if row.shieldAbsorbed > 0 then
+                anyShieldAbsorbed = true
+            end
         end
 
-        for index, row in ipairs(statusSummaryTable) do
-            bgColor = ConditionalValue(index % 2 == 0, kMarinePlayerStatsEvenColor, kMarinePlayerStatsOddColor)
-            local minutes = math.floor(row.timeMinutes)
-            local seconds = (row.timeMinutes % 1)*60
-            local percentage = row.timeMinutes / totalTime * 100
-            table.insert(statCard.rows, CreateHeaderRow(statCard.tableBackground, bgColor, Color(1,1,1,1), row.className, string.format("%d:%02d (%s%%)", minutes, seconds, printNum(percentage))))
+        if anyShieldAbsorbed then
+            table.insert(statCard.rows, CreateThreeColumnRow(statCard.tableBackground, bgColor, Color(1,1,1,1), "Class", "Duration", "Sh. abs"))
+            for index, row in ipairs(statusSummaryTable) do
+                bgColor = ConditionalValue(index % 2 == 0, kMarinePlayerStatsEvenColor, kMarinePlayerStatsOddColor)
+                local minutes = math.floor(row.timeMinutes)
+                local seconds = (row.timeMinutes % 1)*60
+                local percentage = row.timeMinutes / totalTime * 100
+                table.insert(statCard.rows, CreateThreeColumnRow(statCard.tableBackground, bgColor, Color(1,1,1,1), row.className, string.format("%d:%02d (%s%%)", minutes, seconds, printNum(percentage)), printNum2(row.shieldAbsorbed)))
+            end
+        else
+            table.insert(statCard.rows, CreateTwoColumnRow(statCard.tableBackground, bgColor, Color(1,1,1,1), "Class", "Duration"))
+
+            for index, row in ipairs(statusSummaryTable) do
+                bgColor = ConditionalValue(index % 2 == 0, kMarinePlayerStatsEvenColor, kMarinePlayerStatsOddColor)
+                local minutes = math.floor(row.timeMinutes)
+                local seconds = (row.timeMinutes % 1)*60
+                local percentage = row.timeMinutes / totalTime * 100
+                table.insert(statCard.rows, CreateTwoColumnRow(statCard.tableBackground, bgColor, Color(1,1,1,1), row.className, string.format("%d:%02d (%s%%)", minutes, seconds, printNum(percentage))))
+            end
         end
+
         table.insert(self.statsCards, statCard)
     end
 
@@ -2239,7 +2321,7 @@ function GUIGameEndStats:ProcessStats()
                 bgColor = ConditionalValue(index % 2 == 0, kCommanderStatsEvenColor, kCommanderStatsOddColor)
             end
 
-            table.insert(statCard.rows, CreateHeaderRow(statCard.tableBackground, bgColor, Color(1,1,1,1), row.title, row.value))
+            table.insert(statCard.rows, CreateTwoColumnRow(statCard.tableBackground, bgColor, Color(1,1,1,1), row.title, row.value))
         end
         table.insert(self.statsCards, statCard)
     end
@@ -2744,6 +2826,7 @@ local function CHUDSetStatusStats(message)
     local entry = {}
     entry.className = kStatusString[message.statusId] or "Unknown"
     entry.timeMinutes = message.timeMinutes
+    entry.shieldAbsorbed = message.shieldAbsorbed
     table.insert(statusSummaryTable, entry)
 
     lastStatsMsg = Shared.GetTime()

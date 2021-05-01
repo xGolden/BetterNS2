@@ -5,6 +5,11 @@ local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
     StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
 end
 
+local function saveStatsForShieldAbsorb(target, shieldDamage)
+    local targetSteamId, targetTeam, targetLifeform = StatsUI_GetTargetLifeform(target)
+    StatsUI_AddShieldAbsorbStat(targetSteamId, shieldDamage, targetTeam, targetLifeform)
+end
+
 function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode, showtracer)
 
     -- No prediction if the Client is spectating another player.
@@ -99,6 +104,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
 
             if overshieldDamage > 0 and Server then
                 saveStatsForShieldDamage(attacker, doer, overshieldDamage)
+                saveStatsForShieldAbsorb(target, overshieldDamage)
             end
 
             if rawDamage > 0 then

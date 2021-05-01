@@ -307,8 +307,15 @@ function GUIDeathStats:SetStats()
             self:AddRow("Without Onos hits", printNum(statsTable.lastAccOnos) .. "%")
         end
         self:AddRow("Player damage", printNum(statsTable.pdmg))
-        self:AddRow("Shield damage", printNum(statsTable.shieldDmg))
+
+        if Client.GetLocalPlayer():GetTeamNumber() == 1 then
+            self:AddRow("Shield damage", printNum(statsTable.shieldDmg))
+        else
+            self:AddRow("Shield absorbed", printNum(statsTable.shieldAbsorbed))
+        end
+
         self:AddRow("Structure damage", printNum(statsTable.sdmg))
+
         if statsTable.kills > 0 then
             self:AddRow("Kills", printNum(statsTable.kills))
         end

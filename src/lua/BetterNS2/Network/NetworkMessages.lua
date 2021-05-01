@@ -61,7 +61,8 @@ local kPlayerStatsMessage =
     accuracy = "float (0 to 100 by 0.01)",
     accuracyOnos = "float (-1 to 100 by 0.01)",
     pdmg = "float (0 to 524287 by 0.01)",
-    shieldDmg = "float (0 to 524287 by 0.01",
+    shieldDmg = "float (0 to 524287 by 0.01)",
+    shieldAbsorbed = "float (0 to 524287 by 0.01)",
     sdmg = "float (0 to 524287 by 0.01)",
     minutesBuilding = "float (0 to 1023 by 0.01)",
     minutesPlaying = "float (0 to 1023 by 0.01)",
@@ -81,7 +82,7 @@ local kEndStatsWeaponMessage =
     kills = string.format("integer (0 to %d)", kMaxKills),
     teamNumber = "integer (1 to 2)",
     pdmg = "float (0 to 524287 by 0.01)",
-    shieldDmg = "float (0 to 524287 by 0.01",
+    shieldDmg = "float (0 to 524287 by 0.01)",
     sdmg = "float (0 to 524287 by 0.01)",
 }
 RegisterNetworkMessage("EndStatsWeapon", kEndStatsWeaponMessage)
@@ -93,8 +94,17 @@ local kDeathStatsMessage =
     currentAcc = "float (0 to 100 by 0.01)",
     currentAccOnos = "float (-1 to 100 by 0.01)",
     pdmg = "float (0 to 524287 by 0.01)",
-    shieldDmg = "float (0 to 524287 by 0.01",
+    shieldDmg = "float (0 to 524287 by 0.01)",
     sdmg = "float (0 to 524287 by 0.01)",
+    shieldAbsorbed = "float (0 to 524287 by 0.01)",
     kills = string.format("integer (0 to %d)", kMaxKills),
 }
 RegisterNetworkMessage("DeathStats", kDeathStatsMessage)
+
+local kEndStatsStatusMessage =
+{
+    statusId = "enum kPlayerStatus",
+    timeMinutes = "float (0 to 1023 by 0.01)",
+    shieldAbsorbed = "float (0 to 524287 by 0.01)",
+}
+RegisterNetworkMessage("EndStatsStatus", kEndStatsStatusMessage)

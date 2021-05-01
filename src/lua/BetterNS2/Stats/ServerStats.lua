@@ -241,6 +241,7 @@ function StatsUI_ResetLastLifeStats(steamId)
         STATS_ClientStats[steamId]["last"].onosHits = 0
         STATS_ClientStats[steamId]["last"].misses = 0
         STATS_ClientStats[steamId]["last"].kills = 0
+        STATS_ClientStats[steamId]["last"].shieldAbsorbed = 0
     end
 end
 
@@ -268,6 +269,7 @@ function StatsUI_MaybeInitClientStats(steamId, wTechId, teamNumber)
                 entry.timeBuilding = 0
                 entry.timePlayed = 0
                 entry.commanderTime = 0
+                entry.shieldAbsorbed = 0
             end
 
             -- These are team independent
@@ -281,6 +283,7 @@ function StatsUI_MaybeInitClientStats(steamId, wTechId, teamNumber)
 
             STATS_ClientStats[steamId]["weapons"] = {}
             STATS_ClientStats[steamId]["status"] = {}
+            STATS_ClientStats[steamId]["absorb"] = {}
         elseif (teamNumber ~= nil and STATS_ClientStats[steamId].lastTeam ~= teamNumber) then
             STATS_ClientStats[steamId].lastTeam = teamNumber
 
@@ -372,6 +375,22 @@ function StatsUI_AddShieldDamageStat(steamId, damage, wTechId, teamNumber)
             stat.shieldDmg = stat.shieldDmg + damage
             weaponStat.shieldDmg = weaponStat.shieldDmg + damage
             lastStat.shieldDmg = lastStat.shieldDmg + damage
+        end
+    end
+end
+
+function StatsUI_AddShieldAbsorbStat(steamId, shieldAbsorbed, teamNumber, lifeform)
+    if GetGamerules():GetGameStarted() and steamId > 0 and (teamNumber == 1 or teamNumber == 2) then
+        StatsUI_MaybeInitClientStats(steamId, nil, teamNumber)
+
+        if STATS_ClientStats[steamId] then
+            local stat = STATS_ClientStats[steamId][teamNumber]
+            local absorbStat = STATS_ClientStats[steamId]["absorb"] -- table is {lifeformEnumNumber = shieldAbsorbedValue}
+            local lastStat = STATS_ClientStats[steamId]["last"]
+
+            stat.shieldAbsorbed = stat.shieldAbsorbed + shieldAbsorbed
+            absorbStat[lifeform] = (absorbStat[lifeform] or 0) + shieldAbsorbed
+            lastStat.shieldAbsorbed = lastStat.shieldAbsorbed + shieldAbsorbed
         end
     end
 end
@@ -538,6 +557,16 @@ function StatsUI_GetAttackerWeapon(attacker, doer)
     end
 
     return attackerSteamId, attackerWeapon, attackerTeam
+end
+
+function StatsUI_GetTargetLifeform(target)
+    local targetSteamId = target and target:isa("Player") and target:GetSteamId() or nil
+    local targetTeam = target and target:isa("Player") and target:GetTeamNumber() or nil
+
+    -- enum number for lookup from kPlayerStatus
+    local targetLifeform = target and target:isa("Player") and target:GetPlayerStatusDesc() or nil
+
+    return targetSteamId, targetTeam, targetLifeform
 end
 
 function StatsUI_GetStatForClient(steamId)
@@ -725,6 +754,12 @@ function StatsUI_FormatRoundStats()
         end
         stats["status"] = newStatusTable
 
+        local newAbsorbTable = {}
+        for lifeformId, shieldAbsorbed in pairs(stats["absorb"]) do
+            table.insert(newAbsorbTable, {lifeformId = EnumToString(kPlayerStatus, lifeformId), shieldAbsorbed = shieldAbsorbed})
+        end
+        stats["absorb"] = newAbsorbTable
+
         for teamNumber = 1, 2 do
 
             local entry = stats[teamNumber]
@@ -747,6 +782,7 @@ function StatsUI_FormatRoundStats()
                 statEntry.pdmg = entry.pdmg
                 statEntry.shieldDmg = entry.shieldDmg
                 statEntry.sdmg = entry.sdmg
+                statEntry.shieldAbsorbed = entry.shieldAbsorbed
                 statEntry.minutesBuilding = entry.timeBuilding/60
                 statEntry.minutesPlaying = entry.timePlayed/60
                 statEntry.minutesComm = entry.commanderTime/60
@@ -867,12 +903,19 @@ function StatsUI_SendPlayerStats(player)
         Server.SendNetworkMessage(client, "EndStatsWeapon", msg, true)
     end
 
+    local absorbStats = {}
+    for i = 1, #stats.absorb do
+        local entry = stats.absorb[i]
+        absorbStats[entry.lifeformId] = entry.shieldAbsorbed
+    end
+
     for i = 1, #stats.status do
         local entry = stats.status[i]
         local msg = {}
 
         msg.statusId = kPlayerStatus[entry.statusId]
         msg.timeMinutes = entry.classTime / 60
+        msg.shieldAbsorbed = absorbStats[entry.statusId] and absorbStats[entry.statusId] or 0
         Server.SendNetworkMessage(client, "EndStatsStatus", msg, true)
     end
 end
@@ -1089,7 +1132,7 @@ function StatsUI_HandlePreOnKill(self, killer, doer, point, direction)
                     currentAcc, currentAccOnos = CHUDGetAccuracy(hitssum, missessum, onossum)
                 end
 
-                if lastStat.hits > 0 or lastStat.misses > 0 or lastStat.pdmg > 0 or lastStat.shieldDmg or lastStat.sdmg > 0 then
+                if lastStat.hits > 0 or lastStat.misses > 0 or lastStat.pdmg > 0 or lastStat.shieldDmg > 0 or lastStat.sdmg > 0 or lastStat.shieldAbsorbed > 0 then
                     msg.lastAcc = lastAcc
                     msg.lastAccOnos = lastAccOnos
                     msg.currentAcc = currentAcc
@@ -1098,6 +1141,7 @@ function StatsUI_HandlePreOnKill(self, killer, doer, point, direction)
                     msg.shieldDmg = lastStat.shieldDmg
                     msg.sdmg = lastStat.sdmg
                     msg.kills = lastStat.kills
+                    msg.shieldAbsorbed = lastStat.shieldAbsorbed
 
                     Server.SendNetworkMessage(Server.GetOwner(self), "DeathStats", msg, true)
                 end

@@ -1,6 +1,13 @@
+local compModLoaded = isCompModLoaded()
+
 local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
     local attackerSteamId, attackerWeapon, attackerTeam = StatsUI_GetAttackerWeapon(attacker, doer)
     StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
+end
+
+local function saveStatsForShieldAbsorb(target, shieldDamage)
+    local targetSteamId, targetTeam, targetLifeform = StatsUI_GetTargetLifeform(target)
+    StatsUI_AddShieldAbsorbStat(targetSteamId, shieldDamage, targetTeam, targetLifeform)
 end
 
 function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode, showtracer)
@@ -97,6 +104,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
 
             if overshieldDamage > 0 and Server then
                 saveStatsForShieldDamage(attacker, doer, overshieldDamage)
+                saveStatsForShieldAbsorb(target, overshieldDamage)
             end
 
             if rawDamage > 0 then
@@ -167,7 +175,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                     surface = "metal"
                 end
 
-            elseif target:isa("Marine") and target.variant and table.icontains( kRoboticMarineVariantIds, target.variant) then
+            elseif not compModLoaded and target:isa("Marine") and target.variant and table.icontains( kRoboticMarineVariantIds, target.variant) then
                 surface = "robot"
 
             elseif not surface or surface == "" then

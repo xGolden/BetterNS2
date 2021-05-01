@@ -2266,11 +2266,12 @@ function GUIGameEndStats:ProcessStats()
         local statCard = self:CreateGraphicHeader("Classes played", bgColor)
         statCard.rows = {}
         statCard.teamNumber = -2
+
         local anyShieldAbsorbed = false
         local totalTime = 0
         for _, row in ipairs(statusSummaryTable) do
             totalTime = totalTime + row.timeMinutes
-            if row.shieldAbsorbed > 0 then
+            if row.shieldAbsorbed and row.shieldAbsorbed > 0 then
                 anyShieldAbsorbed = true
             end
         end

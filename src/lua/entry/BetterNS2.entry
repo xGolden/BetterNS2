@@ -1,4 +1,6 @@
 modEntry = {
     FileHooks = "lua/BetterNS2/BetterNS2_FileHooks.lua",
+    Server =  "lua/BetterNS2/BetterNS2_Server.lua",
+    Shared = "lua/BetterNS2/BetterNS2_Shared.lua",
     Priority = 49
 }

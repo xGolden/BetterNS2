@@ -1,3 +1,5 @@
+BNS2MainMenu = decoda_name == "Main"
+
 Script.Load("lua/BetterNS2/BetterNS2_Options.lua")
 
 table.insert(gModsCategories, {

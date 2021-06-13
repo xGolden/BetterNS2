@@ -1,7 +1,7 @@
 local compModLoaded = isCompModLoaded()
 
 local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
-    if attacker.isHallucination then
+    if attacker.isHallucination or not attacker:isa("Player") then
         return
     end
 
@@ -10,7 +10,7 @@ local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
 end
 
 local function saveStatsForShieldAbsorb(target, shieldDamage)
-    if target.isHallucination then
+    if target.isHallucination or not target:isa("Player") then
         return
     end
 

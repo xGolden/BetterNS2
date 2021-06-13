@@ -1,11 +1,19 @@
 local compModLoaded = isCompModLoaded()
 
 local function saveStatsForShieldDamage(attacker, doer, shieldDamage)
+    if attacker.isHallucination or not attacker:isa("Player") then
+        return
+    end
+
     local attackerSteamId, attackerWeapon, attackerTeam = StatsUI_GetAttackerWeapon(attacker, doer)
     StatsUI_AddShieldDamageStat(attackerSteamId, shieldDamage, attackerWeapon, attackerTeam)
 end
 
 local function saveStatsForShieldAbsorb(target, shieldDamage)
+    if target.isHallucination or not target:isa("Player") then
+        return
+    end
+
     local targetSteamId, targetTeam, targetLifeform = StatsUI_GetTargetLifeform(target)
     StatsUI_AddShieldAbsorbStat(targetSteamId, shieldDamage, targetTeam, targetLifeform)
 end

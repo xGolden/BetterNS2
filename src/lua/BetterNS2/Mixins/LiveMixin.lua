@@ -105,11 +105,7 @@ function LiveMixin:TakeDamage(damage, attacker, doer, point, direction, armorUse
             -- Check if there is a doer, because when alien structures are off infestation
             -- it will count as an attack for the last person that shot it, only log actual attacks
             if attackerTeam ~= targetTeam and damage and doer then
-                if self:isa("Player") and not (self:isa("Hallucination") or self.isHallucination) then
-                    StatsUI_AddPlayerDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
-                else
-                    StatsUI_AddStructureDamageStat(attackerSteamId, damageDone, attackerWeapon, attackerTeam)
-                end
+                StatsUI_AddDamageStat(attackerSteamId, damageDone, self and self:isa("Player") and not (self:isa("Hallucination") or self.isHallucination), attackerWeapon, attackerTeam)
             end
         end
 

@@ -1,4 +1,4 @@
-kBetterNS2Version = 7
+kBetterNS2Version = 8
 
 function isCompModLoaded()
     return g_compModRevision

@@ -2,9 +2,10 @@
 --
 -- lua/GUIDeathStats.lua
 --
--- Created by: Darrell Gentry (darrell@naturalselection2.com)
+-- Ported by: Darrell Gentry (darrell@naturalselection2.com)
 --
 -- Port of the NS2+ death stats. It displays personal stats for your last life.
+-- Originally Created By: Juanjo Alfaro "Mendasp"
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
@@ -315,7 +316,6 @@ function GUIDeathStats:SetStats()
         end
 
         self:AddRow("Structure damage", printNum(statsTable.sdmg))
-
         if statsTable.kills > 0 then
             self:AddRow("Kills", printNum(statsTable.kills))
         end

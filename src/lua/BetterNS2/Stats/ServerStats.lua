@@ -2,9 +2,10 @@
 --
 -- lua/ServerStats.lua
 --
--- Created by: Darrell Gentry (darrell@naturalselection2.com)
+-- Ported by: Darrell Gentry (darrell@naturalselection2.com)
 --
 -- Port of the NS2+ stats tracker.
+-- Originally Created By: Juanjo Alfaro "Mendasp"
 --
 -- ========= For more information, visit us at http://www.unknownworlds.com =====================
 
@@ -71,7 +72,7 @@ local function GetGameTime(inMinutes)
     return gameTime
 end
 
-function StatsUI_AddExportBuilding(teamNumber, techId, built, destroyed, recycled, extraInfo)
+function StatsUI_AddExportBuilding(teamNumber, techId, location, built, destroyed, recycled, extraInfo)
 
     table.insert(STATS_ExportBuilding,
             {
@@ -80,7 +81,8 @@ function StatsUI_AddExportBuilding(teamNumber, techId, built, destroyed, recycle
                 gameTime = GetGameTime(),
                 built = built,
                 destroyed = destroyed,
-                recycled = recycled
+                recycled = recycled,
+                location = tostring(location)
             })
 
 
@@ -184,6 +186,7 @@ end
 local techLoggedAsBuilding = set {
     kTechId.ARC,
     kTechId.MAC,
+    kTechId.Drifter
 }
 
 function StatsUI_GetTechLoggedAsBuilding(techId)
@@ -194,11 +197,12 @@ local techLogBuildings = set {
     "ArmsLab",
     "PrototypeLab",
     "Observatory",
+    "InfantryPortal",
     "CommandStation",
     "Veil",
     "Shell",
     "Spur",
-    "Hive",
+    "Hive"
 }
 
 function StatsUI_GetBuildingLogged(structureName)
@@ -347,18 +351,27 @@ function StatsUI_AddAccuracyStat(steamId, wTechId, wasHit, isOnos, teamNumber)
     end
 end
 
-function StatsUI_AddPlayerDamageStat(steamId, damage, wTechId, teamNumber)
+function StatsUI_AddDamageStat(steamId, damage, isPlayer, wTechId, teamNumber)
+
     if GetGamerules():GetGameStarted() and steamId > 0 and (teamNumber == 1 or teamNumber == 2) then
+
         StatsUI_MaybeInitClientStats(steamId, wTechId, teamNumber)
 
         if STATS_ClientStats[steamId] then
+
             local stat = STATS_ClientStats[steamId][teamNumber]
             local weaponStat = STATS_ClientStats[steamId]["weapons"][wTechId]
             local lastStat = STATS_ClientStats[steamId]["last"]
 
-            stat.pdmg = stat.pdmg + damage
-            weaponStat.pdmg = weaponStat.pdmg + damage
-            lastStat.pdmg = lastStat.pdmg + damage
+            if isPlayer then
+                stat.pdmg = stat.pdmg + damage
+                weaponStat.pdmg = weaponStat.pdmg + damage
+                lastStat.pdmg = lastStat.pdmg + damage
+            else
+                stat.sdmg = stat.sdmg + damage
+                weaponStat.sdmg = weaponStat.sdmg + damage
+                lastStat.sdmg = lastStat.sdmg + damage
+            end
         end
     end
 end
@@ -391,22 +404,6 @@ function StatsUI_AddShieldAbsorbStat(steamId, shieldAbsorbed, teamNumber, lifefo
             stat.shieldAbsorbed = stat.shieldAbsorbed + shieldAbsorbed
             absorbStat[lifeform] = (absorbStat[lifeform] or 0) + shieldAbsorbed
             lastStat.shieldAbsorbed = lastStat.shieldAbsorbed + shieldAbsorbed
-        end
-    end
-end
-
-function StatsUI_AddStructureDamageStat(steamId, damage, wTechId, teamNumber)
-    if GetGamerules():GetGameStarted() and steamId > 0 and (teamNumber == 1 or teamNumber == 2) then
-        StatsUI_MaybeInitClientStats(steamId, wTechId, teamNumber)
-
-        if STATS_ClientStats[steamId] then
-            local stat = STATS_ClientStats[steamId][teamNumber]
-            local weaponStat = STATS_ClientStats[steamId]["weapons"][wTechId]
-            local lastStat = STATS_ClientStats[steamId]["last"]
-
-            stat.sdmg = stat.sdmg + damage
-            weaponStat.sdmg = weaponStat.sdmg + damage
-            lastStat.sdmg = lastStat.sdmg + damage
         end
     end
 end
